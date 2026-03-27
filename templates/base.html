@@ -19,6 +19,7 @@
                 {% if user.is_authenticated %}
                 <li><a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a></li>
                 {% if user.is_staff %}
+                <li><a href="{% url 'admin_panel' %}" class="{% if 'admin-panel' in request.path %}active{% endif %}">⚙ Admin</a></li>
                 <li><a href="{% url 'upload_csv' %}" class="{% if request.resolver_match.url_name == 'upload_csv' %}active{% endif %}">Importar CSV</a></li>
                 {% endif %}
                 <li>

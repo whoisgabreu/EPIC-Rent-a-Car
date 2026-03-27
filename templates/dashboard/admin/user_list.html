@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Usuários — Admin EPIC{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <div class="page-header">
+        <div>
+            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › Usuários</nav>
+            <h1 class="page-title">Usuários</h1>
+        </div>
+        <a href="{% url 'admin_user_create' %}" class="btn btn-primary">+ Novo Usuário</a>
+    </div>
+
+    <!-- Search -->
+    <form method="get" class="search-bar">
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por nome ou e-mail…" class="search-input">
+        <button type="submit" class="btn btn-secondary">Buscar</button>
+        {% if request.GET.q %}<a href="{% url 'admin_user_list' %}" class="btn btn-ghost">Limpar</a>{% endif %}
+    </form>
+
+    <!-- Table -->
+    <div class="table-card">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Usuário</th>
+                    <th>E-mail</th>
+                    <th>Perfil</th>
+                    <th>Status</th>
+                    <th>Investidor Vinculado</th>
+                    <th class="text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td><strong>{{ u.username }}</strong></td>
+                    <td>{{ u.email|default:"—" }}</td>
+                    <td>
+                        {% if u.is_superuser %}<span class="badge badge-purple">Superadmin</span>
+                        {% elif u.is_staff %}<span class="badge badge-blue">Admin</span>
+                        {% else %}<span class="badge badge-gray">Investidor</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if u.is_active %}<span class="badge badge-green">Ativo</span>
+                        {% else %}<span class="badge badge-red">Inativo</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if u.investor_profile %}
+                            <a href="{% url 'admin_investor_edit' u.investor_profile.pk %}">{{ u.investor_profile.name }}</a>
+                        {% else %}<span class="text-muted">—</span>{% endif %}
+                    </td>
+                    <td class="text-right actions-cell">
+                        <a href="{% url 'admin_user_edit' u.pk %}" class="btn-action btn-action--edit" title="Editar">✏️</a>
+                        {% if u != request.user %}
+                        <a href="{% url 'admin_user_delete' u.pk %}" class="btn-action btn-action--delete" title="Excluir">🗑️</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="table-empty">Nenhum usuário encontrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-ghost">‹ Anterior</a>
+        {% endif %}
+        <span class="page-info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-ghost">Próxima ›</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

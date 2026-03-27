@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Investidor — Admin EPIC{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <div class="page-header">
+        <div>
+            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › <a href="{% url 'admin_investor_list' %}">Investidores</a> › {{ action }}</nav>
+            <h1 class="page-title">{{ action }} Investidor</h1>
+        </div>
+    </div>
+
+    <div class="form-layout">
+        <!-- Main Form -->
+        <div class="form-card">
+            {% if object %}
+            <div class="form-meta">Editando: <strong>{{ object.name }}</strong></div>
+            {% endif %}
+
+            <form method="post" class="admin-form" novalidate>
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group {% if field.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ field.id_for_label }}">
+                        {{ field.label }}{% if field.field.required %} <span class="required">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% for error in field.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+                </div>
+                {% endfor %}
+
+                <div class="form-actions">
+                    <a href="{% url 'admin_investor_list' %}" class="btn btn-ghost">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">{{ action }} Investidor</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Side Panel: Linked Vehicles -->
+        {% if object %}
+        <div class="side-panel">
+            <div class="side-panel-header">
+                <h3>🚗 Veículos Vinculados</h3>
+                <a href="{% url 'admin_vehicle_create' %}?investor={{ object.pk }}" class="btn btn-sm btn-primary">+ Adicionar</a>
+            </div>
+            <div class="side-panel-body">
+                {% for v in vehicles %}
+                <div class="vehicle-row">
+                    <div class="vehicle-row-info">
+                        <span class="vehicle-plate">{{ v.plate }}</span>
+                        <span class="vehicle-model">{{ v.year_make_model }}</span>
+                        <span class="badge {% if v.status == 'Active' %}badge-green{% else %}badge-gray{% endif %}">{{ v.status }}</span>
+                    </div>
+                    <div class="vehicle-row-actions">
+                        <a href="{% url 'admin_vehicle_edit' v.pk %}" class="btn-action btn-action--edit" title="Editar">✏️</a>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted side-empty">Nenhum veículo vinculado.</p>
+                {% endfor %}
+            </div>
+            <div class="side-panel-footer">
+                <a href="{% url 'admin_vehicle_list' %}?investor_id={{ object.pk }}" class="btn btn-ghost btn-full">Ver todos os veículos →</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

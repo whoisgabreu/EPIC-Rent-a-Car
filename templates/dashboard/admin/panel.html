@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Painel Administrativo — EPIC{% endblock %}
+
+{% block content %}
+<div class="admin-panel">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Painel Administrativo</h1>
+            <p class="page-subtitle">Gerencie usuários, investidores e veículos da plataforma</p>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ total_users }}</span>
+                <span class="stat-label">Usuários</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💼</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ total_investors }}</span>
+                <span class="stat-label">Investidores</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🚗</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ total_vehicles }}</span>
+                <span class="stat-label">Veículos</span>
+            </div>
+        </div>
+        <div class="stat-card stat-card--warning">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ unlinked_investors }}</span>
+                <span class="stat-label">Investidores sem login</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Cards -->
+    <div class="admin-nav-grid">
+        <a href="{% url 'admin_user_list' %}" class="admin-nav-card">
+            <div class="admin-nav-icon">👥</div>
+            <div class="admin-nav-body">
+                <h3>Usuários</h3>
+                <p>Criar, editar e gerenciar perfis de acesso</p>
+            </div>
+            <span class="admin-nav-arrow">→</span>
+        </a>
+
+        <a href="{% url 'admin_investor_list' %}" class="admin-nav-card">
+            <div class="admin-nav-icon">💼</div>
+            <div class="admin-nav-body">
+                <h3>Investidores</h3>
+                <p>Gerenciar investidores e seus veículos vinculados</p>
+            </div>
+            <span class="admin-nav-arrow">→</span>
+        </a>
+
+        <a href="{% url 'admin_vehicle_list' %}" class="admin-nav-card">
+            <div class="admin-nav-icon">🚗</div>
+            <div class="admin-nav-body">
+                <h3>Veículos</h3>
+                <p>Cadastrar e vincular veículos a investidores</p>
+            </div>
+            <span class="admin-nav-arrow">→</span>
+        </a>
+
+        <a href="{% url 'upload_csv' %}" class="admin-nav-card">
+            <div class="admin-nav-icon">📊</div>
+            <div class="admin-nav-body">
+                <h3>Importar CSV</h3>
+                <p>Carregar dados de viagens da Turo</p>
+            </div>
+            <span class="admin-nav-arrow">→</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

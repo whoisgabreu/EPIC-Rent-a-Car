@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Usuário — Admin EPIC{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <div class="page-header">
+        <div>
+            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › <a href="{% url 'admin_user_list' %}">Usuários</a> › {{ action }}</nav>
+            <h1 class="page-title">{{ action }} Usuário</h1>
+        </div>
+    </div>
+
+    <div class="form-card">
+        {% if object %}
+        <div class="form-meta">
+            <span>Editando: <strong>{{ object.username }}</strong></span>
+        </div>
+        {% endif %}
+
+        <form method="post" class="admin-form" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group {% if field.errors %}has-error{% endif %}">
+                <label class="form-label" for="{{ field.id_for_label }}">
+                    {{ field.label }}{% if field.field.required %} <span class="required">*</span>{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}<p class="form-help">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+            </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <a href="{% url 'admin_user_list' %}" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary">{{ action }} Usuário</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
