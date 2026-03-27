@@ -5,7 +5,7 @@ class Investor(models.Model):
     user = models.OneToOneField(User, related_name='investor_profile', on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=255, unique=True, verbose_name="Nome do Investidor")
     status = models.CharField(max_length=50, default='Active', verbose_name="Status")
-    total_invested = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Total Investido")
+
     
     class Meta:
         verbose_name = "Investidor"

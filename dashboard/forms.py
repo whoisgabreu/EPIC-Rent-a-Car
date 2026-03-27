@@ -76,14 +76,11 @@ class InvestorForm(forms.ModelForm):
 
     class Meta:
         model = Investor
-        fields = ['name', 'status', 'user', 'total_invested']
+        fields = ['name', 'status', 'user']
         labels = {
             'name': 'Nome do Investidor',
-            'total_invested': 'Total Investido (R$)',
         }
-        widgets = {
-            'total_invested': forms.NumberInput(attrs={'step': '0.01', 'min': '0'}),
-        }
+
 
     def __init__(self, *args, **kwargs):
         # Accept the current investor instance so we include its own user in the queryset
