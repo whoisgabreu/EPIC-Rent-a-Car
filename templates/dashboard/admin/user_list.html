@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
-{% block title %}Usuários — Admin EPIC{% endblock %}
+{% block title %}Users — EPIC Admin{% endblock %}
 
 {% block content %}
 <div class="admin-section">
     <div class="page-header">
         <div>
-            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › Usuários</nav>
-            <h1 class="page-title">Usuários</h1>
+            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › Users</nav>
+            <h1 class="page-title">Users</h1>
         </div>
-        <a href="{% url 'admin_user_create' %}" class="btn btn-primary">+ Novo Usuário</a>
+        <a href="{% url 'admin_user_create' %}" class="btn btn-primary">+ New User</a>
     </div>
 
     <!-- Search -->
     <form method="get" class="search-bar">
-        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por nome ou e-mail…" class="search-input">
-        <button type="submit" class="btn btn-secondary">Buscar</button>
-        {% if request.GET.q %}<a href="{% url 'admin_user_list' %}" class="btn btn-ghost">Limpar</a>{% endif %}
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search by name or email..." class="search-input">
+        <button type="submit" class="btn btn-secondary">Search</button>
+        {% if request.GET.q %}<a href="{% url 'admin_user_list' %}" class="btn btn-ghost">Clear</a>{% endif %}
     </form>
 
     <!-- Table -->
@@ -23,12 +23,12 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Usuário</th>
-                    <th>E-mail</th>
-                    <th>Perfil</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Profile</th>
                     <th>Status</th>
-                    <th>Investidor Vinculado</th>
-                    <th class="text-right">Ações</th>
+                    <th>Linked Investor</th>
+                    <th class="text-right">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,11 +39,11 @@
                     <td>
                         {% if u.is_superuser %}<span class="badge badge-purple">Superadmin</span>
                         {% elif u.is_staff %}<span class="badge badge-blue">Admin</span>
-                        {% else %}<span class="badge badge-gray">Investidor</span>{% endif %}
+                        {% else %}<span class="badge badge-gray">Investor</span>{% endif %}
                     </td>
                     <td>
-                        {% if u.is_active %}<span class="badge badge-green">Ativo</span>
-                        {% else %}<span class="badge badge-red">Inativo</span>{% endif %}
+                        {% if u.is_active %}<span class="badge badge-green">Active</span>
+                        {% else %}<span class="badge badge-red">Inactive</span>{% endif %}
                     </td>
                     <td>
                         {% if u.investor_profile %}
@@ -51,14 +51,14 @@
                         {% else %}<span class="text-muted">—</span>{% endif %}
                     </td>
                     <td class="text-right actions-cell">
-                        <a href="{% url 'admin_user_edit' u.pk %}" class="btn-action btn-action--edit" title="Editar">✏️</a>
+                        <a href="{% url 'admin_user_edit' u.pk %}" class="btn-action btn-action--edit" title="Edit">✏️</a>
                         {% if u != request.user %}
-                        <a href="{% url 'admin_user_delete' u.pk %}" class="btn-action btn-action--delete" title="Excluir">🗑️</a>
+                        <a href="{% url 'admin_user_delete' u.pk %}" class="btn-action btn-action--delete" title="Delete">🗑️</a>
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="table-empty">Nenhum usuário encontrado.</td></tr>
+                <tr><td colspan="6" class="table-empty">No users found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -68,11 +68,11 @@
     {% if is_paginated %}
     <div class="pagination">
         {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-ghost">‹ Anterior</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-ghost">‹ Previous</a>
         {% endif %}
-        <span class="page-info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-ghost">Próxima ›</a>
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-ghost">Next ›</a>
         {% endif %}
     </div>
     {% endif %}

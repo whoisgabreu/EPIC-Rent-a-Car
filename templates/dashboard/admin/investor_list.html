@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
-{% block title %}Investidores — Admin EPIC{% endblock %}
+{% block title %}Investors — EPIC Admin{% endblock %}
 
 {% block content %}
 <div class="admin-section">
     <div class="page-header">
         <div>
-            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › Investidores</nav>
-            <h1 class="page-title">Investidores</h1>
+            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › Investors</nav>
+            <h1 class="page-title">Investors</h1>
         </div>
-        <a href="{% url 'admin_investor_create' %}" class="btn btn-primary">+ Novo Investidor</a>
+        <a href="{% url 'admin_investor_create' %}" class="btn btn-primary">+ New Investor</a>
     </div>
 
     <!-- Search -->
     <form method="get" class="search-bar">
-        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar investidor…" class="search-input">
-        <button type="submit" class="btn btn-secondary">Buscar</button>
-        {% if request.GET.q %}<a href="{% url 'admin_investor_list' %}" class="btn btn-ghost">Limpar</a>{% endif %}
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search investor..." class="search-input">
+        <button type="submit" class="btn btn-secondary">Search</button>
+        {% if request.GET.q %}<a href="{% url 'admin_investor_list' %}" class="btn btn-ghost">Clear</a>{% endif %}
     </form>
 
     <!-- Table -->
@@ -23,11 +23,11 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Investidor</th>
-                    <th>Usuário</th>
+                    <th>Investor</th>
+                    <th>User</th>
                     <th>Status</th>
-                    <th>Veículos</th>
-                    <th class="text-right">Ações</th>
+                    <th>Vehicles</th>
+                    <th class="text-right">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,14 +38,14 @@
                         {% if investor.user %}
                             <span class="badge badge-green">{{ investor.user.username }}</span>
                         {% else %}
-                            <span class="badge badge-red">Sem login</span>
+                            <span class="badge badge-red">No login</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if investor.status == 'Active' %}
-                            <span class="badge badge-green">Ativo</span>
+                            <span class="badge badge-green">Active</span>
                         {% else %}
-                            <span class="badge badge-gray">Inativo</span>
+                            <span class="badge badge-gray">Inactive</span>
                         {% endif %}
                     </td>
                     <td>
@@ -53,17 +53,17 @@
                             {% for v in investor.owned_vehicles.all %}
                                 <span class="vehicle-tag">{{ v.plate }}</span>
                             {% empty %}
-                                <span class="text-muted">Nenhum</span>
+                                <span class="text-muted">None</span>
                             {% endfor %}
                         </div>
                     </td>
                     <td class="text-right actions-cell">
-                        <a href="{% url 'admin_investor_edit' investor.pk %}" class="btn-action btn-action--edit" title="Editar">✏️</a>
-                        <a href="{% url 'admin_investor_delete' investor.pk %}" class="btn-action btn-action--delete" title="Excluir">🗑️</a>
+                        <a href="{% url 'admin_investor_edit' investor.pk %}" class="btn-action btn-action--edit" title="Edit">✏️</a>
+                        <a href="{% url 'admin_investor_delete' investor.pk %}" class="btn-action btn-action--delete" title="Delete">🗑️</a>
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5" class="table-empty">Nenhum investidor encontrado.</td></tr>
+                <tr><td colspan="5" class="table-empty">No investors found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -71,9 +71,9 @@
 
     {% if is_paginated %}
     <div class="pagination">
-        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-ghost">‹ Anterior</a>{% endif %}
-        <span class="page-info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-ghost">Próxima ›</a>{% endif %}
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-ghost">‹ Previous</a>{% endif %}
+        <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-ghost">Next ›</a>{% endif %}
     </div>
     {% endif %}
 </div>

@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
-{% block title %}{{ action }} Usuário — Admin EPIC{% endblock %}
+{% block title %}{{ action }} User — EPIC Admin{% endblock %}
 
 {% block content %}
 <div class="admin-section">
     <div class="page-header">
         <div>
-            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › <a href="{% url 'admin_user_list' %}">Usuários</a> › {{ action }}</nav>
-            <h1 class="page-title">{{ action }} Usuário</h1>
+            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › <a href="{% url 'admin_user_list' %}">Users</a> › {{ action }}</nav>
+            <h1 class="page-title">{{ action }} User</h1>
         </div>
     </div>
 
     <div class="form-card">
         {% if object %}
         <div class="form-meta">
-            <span>Editando: <strong>{{ object.username }}</strong></span>
+            <span>Editing: <strong>{{ object.username }}</strong></span>
         </div>
         {% endif %}
 
@@ -31,8 +31,8 @@
             {% endfor %}
 
             <div class="form-actions">
-                <a href="{% url 'admin_user_list' %}" class="btn btn-ghost">Cancelar</a>
-                <button type="submit" class="btn btn-primary">{{ action }} Usuário</button>
+                <a href="{% url 'admin_user_list' %}" class="btn btn-ghost">Cancel</a>
+                <button type="submit" class="btn btn-primary">{{ action }} User</button>
             </div>
         </form>
     </div>

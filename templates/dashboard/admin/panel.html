@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
-{% block title %}Painel Administrativo — EPIC{% endblock %}
+{% block title %}Administrative Panel — EPIC{% endblock %}
 
 {% block content %}
 <div class="admin-panel">
     <div class="page-header">
         <div>
-            <h1 class="page-title">Painel Administrativo</h1>
-            <p class="page-subtitle">Gerencie usuários, investidores e veículos da plataforma</p>
+            <h1 class="page-title">Administrative Panel</h1>
+            <p class="page-subtitle">Manage platform users, investors, and vehicles</p>
         </div>
     </div>
 
@@ -16,28 +16,28 @@
             <div class="stat-icon">👥</div>
             <div class="stat-info">
                 <span class="stat-value">{{ total_users }}</span>
-                <span class="stat-label">Usuários</span>
+                <span class="stat-label">Users</span>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">💼</div>
             <div class="stat-info">
                 <span class="stat-value">{{ total_investors }}</span>
-                <span class="stat-label">Investidores</span>
+                <span class="stat-label">Investors</span>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">🚗</div>
             <div class="stat-info">
                 <span class="stat-value">{{ total_vehicles }}</span>
-                <span class="stat-label">Veículos</span>
+                <span class="stat-label">Vehicles</span>
             </div>
         </div>
         <div class="stat-card stat-card--warning">
             <div class="stat-icon">⚠️</div>
             <div class="stat-info">
                 <span class="stat-value">{{ unlinked_investors }}</span>
-                <span class="stat-label">Investidores sem login</span>
+                <span class="stat-label">Investors without login</span>
             </div>
         </div>
     </div>
@@ -47,8 +47,8 @@
         <a href="{% url 'admin_user_list' %}" class="admin-nav-card">
             <div class="admin-nav-icon">👥</div>
             <div class="admin-nav-body">
-                <h3>Usuários</h3>
-                <p>Criar, editar e gerenciar perfis de acesso</p>
+                <h3>Users</h3>
+                <p>Create, edit, and manage access profiles</p>
             </div>
             <span class="admin-nav-arrow">→</span>
         </a>
@@ -56,8 +56,8 @@
         <a href="{% url 'admin_investor_list' %}" class="admin-nav-card">
             <div class="admin-nav-icon">💼</div>
             <div class="admin-nav-body">
-                <h3>Investidores</h3>
-                <p>Gerenciar investidores e seus veículos vinculados</p>
+                <h3>Investors</h3>
+                <p>Manage investors and their linked vehicles</p>
             </div>
             <span class="admin-nav-arrow">→</span>
         </a>
@@ -65,8 +65,8 @@
         <a href="{% url 'admin_vehicle_list' %}" class="admin-nav-card">
             <div class="admin-nav-icon">🚗</div>
             <div class="admin-nav-body">
-                <h3>Veículos</h3>
-                <p>Cadastrar e vincular veículos a investidores</p>
+                <h3>Vehicles</h3>
+                <p>Register and link vehicles to investors</p>
             </div>
             <span class="admin-nav-arrow">→</span>
         </a>
@@ -74,8 +74,8 @@
         <a href="{% url 'upload_csv' %}" class="admin-nav-card">
             <div class="admin-nav-icon">📊</div>
             <div class="admin-nav-body">
-                <h3>Importar CSV</h3>
-                <p>Carregar dados de viagens da Turo</p>
+                <h3>Import CSV</h3>
+                <p>Load trip data from Turo</p>
             </div>
             <span class="admin-nav-arrow">→</span>
         </a>

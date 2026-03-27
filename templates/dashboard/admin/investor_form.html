@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
-{% block title %}{{ action }} Investidor — Admin EPIC{% endblock %}
+{% block title %}{{ action }} Investor — EPIC Admin{% endblock %}
 
 {% block content %}
 <div class="admin-section">
     <div class="page-header">
         <div>
-            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › <a href="{% url 'admin_investor_list' %}">Investidores</a> › {{ action }}</nav>
-            <h1 class="page-title">{{ action }} Investidor</h1>
+            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › <a href="{% url 'admin_investor_list' %}">Investors</a> › {{ action }}</nav>
+            <h1 class="page-title">{{ action }} Investor</h1>
         </div>
     </div>
 
@@ -14,7 +14,7 @@
         <!-- Main Form -->
         <div class="form-card">
             {% if object %}
-            <div class="form-meta">Editando: <strong>{{ object.name }}</strong></div>
+            <div class="form-meta">Editing: <strong>{{ object.name }}</strong></div>
             {% endif %}
 
             <form method="post" class="admin-form" novalidate>
@@ -30,8 +30,8 @@
                 {% endfor %}
 
                 <div class="form-actions">
-                    <a href="{% url 'admin_investor_list' %}" class="btn btn-ghost">Cancelar</a>
-                    <button type="submit" class="btn btn-primary">{{ action }} Investidor</button>
+                    <a href="{% url 'admin_investor_list' %}" class="btn btn-ghost">Cancel</a>
+                    <button type="submit" class="btn btn-primary">{{ action }} Investor</button>
                 </div>
             </form>
         </div>
@@ -40,8 +40,8 @@
         {% if object %}
         <div class="side-panel">
             <div class="side-panel-header">
-                <h3>🚗 Veículos Vinculados</h3>
-                <a href="{% url 'admin_vehicle_create' %}?investor={{ object.pk }}" class="btn btn-sm btn-primary">+ Adicionar</a>
+                <h3>🚗 Linked Vehicles</h3>
+                <a href="{% url 'admin_vehicle_create' %}?investor={{ object.pk }}" class="btn btn-sm btn-primary">+ Add</a>
             </div>
             <div class="side-panel-body">
                 {% for v in vehicles %}
@@ -52,15 +52,15 @@
                         <span class="badge {% if v.status == 'Active' %}badge-green{% else %}badge-gray{% endif %}">{{ v.status }}</span>
                     </div>
                     <div class="vehicle-row-actions">
-                        <a href="{% url 'admin_vehicle_edit' v.pk %}" class="btn-action btn-action--edit" title="Editar">✏️</a>
+                        <a href="{% url 'admin_vehicle_edit' v.pk %}" class="btn-action btn-action--edit" title="Edit">✏️</a>
                     </div>
                 </div>
                 {% empty %}
-                <p class="text-muted side-empty">Nenhum veículo vinculado.</p>
+                <p class="text-muted side-empty">No linked vehicles.</p>
                 {% endfor %}
             </div>
             <div class="side-panel-footer">
-                <a href="{% url 'admin_vehicle_list' %}?investor_id={{ object.pk }}" class="btn btn-ghost btn-full">Ver todos os veículos →</a>
+                <a href="{% url 'admin_vehicle_list' %}?investor_id={{ object.pk }}" class="btn btn-ghost btn-full">View all vehicles →</a>
             </div>
         </div>
         {% endif %}

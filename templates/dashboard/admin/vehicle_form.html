@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
-{% block title %}{{ action }} Veículo — Admin EPIC{% endblock %}
+{% block title %}{{ action }} Vehicle — EPIC Admin{% endblock %}
 
 {% block content %}
 <div class="admin-section">
     <div class="page-header">
         <div>
-            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › <a href="{% url 'admin_vehicle_list' %}">Veículos</a> › {{ action }}</nav>
-            <h1 class="page-title">{{ action }} Veículo</h1>
+            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › <a href="{% url 'admin_vehicle_list' %}">Vehicles</a> › {{ action }}</nav>
+            <h1 class="page-title">{{ action }} Vehicle</h1>
         </div>
     </div>
 
     <div class="form-card form-card--narrow">
         {% if object %}
-        <div class="form-meta">Editando: <strong>{{ object.year_make_model }}</strong> — <span class="vehicle-plate">{{ object.plate }}</span></div>
+        <div class="form-meta">Editing: <strong>{{ object.year_make_model }}</strong> — <span class="vehicle-plate">{{ object.plate }}</span></div>
         {% endif %}
 
         <form method="post" class="admin-form" novalidate>
@@ -29,8 +29,8 @@
             {% endfor %}
 
             <div class="form-actions">
-                <a href="{% url 'admin_vehicle_list' %}" class="btn btn-ghost">Cancelar</a>
-                <button type="submit" class="btn btn-primary">{{ action }} Veículo</button>
+                <a href="{% url 'admin_vehicle_list' %}" class="btn btn-ghost">Cancel</a>
+                <button type="submit" class="btn btn-primary">{{ action }} Vehicle</button>
             </div>
         </form>
     </div>
