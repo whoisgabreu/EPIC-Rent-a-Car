@@ -1,0 +1,7 @@
+name, linked_user, status, investments, total_invested_amount; active_investments_amount, vehicles, kpi_monthly_by_investor, notes
+Ricardo Lima;ricardo@r27business.com;Active;2017 Jeep Compass, 2022 Chevrolet Malibu, 2016 Cadillac Escalade, 2021 Chrysler Pacifica, 2017 Ford Fusion Hybrid, 2021 Kia Sedona, 2019 VW Atlas, 2018 VW Tiguan, 2018 Jeep Gran Cherokee;105700;9;1C4NJCBA1HD148236, 1G1ZD5ST9NF179636, 1GYS3AKJ5GR367407, 2C4RC1BG4MR527646, 3FA6P0LU0HR357006, KNDMB5C19M6662370, 1V2DR2CA3KC624222, 3VV3B7AX9JM166500, 1C4RJEAG3JC339719;;
+Daniele Pieralisi;danielapieralisi@hotmail.com;Active;2020 Chevrolet Malibu, 2020 Buick Encore;24000;2;1G1ZD5ST5LF118751, KL4CJASB2LB014127;;
+Eduardo Lima;eduardohrl@hotmail.com;Active;2019 Kia Sorento;12000;1;5XYPG4A52KG490739;;
+Roberto Cunha;roberto@nextmaxi.com;Active;2022 Mitsubishi Outlander;20000;1;JA4J3VA89NZ084250;;
+Michelle Senna;michelle@umbrellablu.com;Active;2017 Chrysler Pacifica;10000;1;2C4RC1BG8HR692069;;
+Rafael Chagas;rafael@umbrellablu.com;Active;2022 Chrysler Pacifica;14000;1;2C4RC1BG5MR591954;;

@@ -1,0 +1,173 @@
+Epic Investor Portal 2.0 — Product Owner Specification 
+1. Visão do Produto 
+O Epic Investor Portal 2.0 é uma plataforma de visibilidade operacional e financeira para investidores da Epic Rental 
+Car. Seu objetivo não é contábil nem bancário, mas sim refletir de forma fluida, atualizada e transparente a 
+realidade diária da operação na Turo, permitindo que investidores acompanhem desempenho por ativo, por mês e de 
+forma consolidada. 
+A plataforma é data-driven, tendo a Turo como fonte única da verdade (RAW) para receitas, status e histórico das 
+viagens. O Airtable atua como motor de organização, consolidação e cálculo por competência, enquanto o Softr é 
+utilizado exclusivamente como camada de apresentação. 
+Este produto não busca congelar números nem criar um ledger imutável. Ele existe para dar visibilidade contínua ao 
+investidor sobre uma operação real, mutável e viva. 
+2. Princípios Fundamentais 
+1. Turo é a fonte da verdade (dados mutáveis, auditados externamente). 
+2. Airtable consolida e calcula (KPIs por competência / período). 
+3. Softr apenas apresenta (não executa lógica financeira crítica). 
+4. Sem contabilidade pesada: não há ledger imutável nem fechamento automático. 
+5. Fechamentos Quarter a Quarter são manuais, fora do fluxo operacional. 
+3. Escopo do Produto 
+Dentro do escopo 
+• Receita, custos e margem por veículo e mês (competência) 
+• Consolidação automática por investidor 
+• Dados sempre atualizados conforme alterações da Turo 
+• Visualização estilo Excel (DRE) via Softr 
+Fora do escopo 
+• Sistema contábil 
+• Pagamentos automáticos 
+• Ledger imutável 
+• Auditoria fiscal 
+4. Arquitetura Geral 
+[Turo CSV Export] 
+↓ (Merge by Trip ID) 
+[Airtable - Revenue-Trips] 
+↓ (scripts de linkagem) 
+[Airtable - KPI_Monthly_By_Vehicle] 
+↓ (Views consolidadas) 
+[Softr - Investor Portal] 
+5. Modelo de Dados — Airtable 
+5.1 Tabela: Revenue-Trips (RAW — Espelho da Turo) 
+Função: Armazenar os dados exatamente como exportados pela Turo, sem alteração estrutural. 
+Esta tabela é ingerida no mesmo formato do CSV original da Turo, preservando todas as colunas, mesmo aquelas que 
+não são utilizadas nos cálculos. Isso reduz risco de erro, elimina retrabalho e permite merge seguro ao longo do tempo. 
+Regras fundamentais: 
+• Fonte da verdade da receita 
+• Dados mutáveis (status, valores e datas podem mudar) 
+• Histórico é confiável porque reflete a própria Turo 
+Importação: 
+• Frequência: semanal 
+• Modo: Merge with existing table 
+• Chave: Trip ID (ou Earning ID) 
+• Ações permitidas: Update + Create 
+• Ação proibida: Delete 
+Campos operacionais usados: 
+• Trip ID 
+• Status 
+• Gross Earnings Turo 
+• Extras 
+• Tolls 
+• Parking 
+• Vehicle (link) 
+• Period (YYYY-MM) 
+5.2 Tabela: Vehicles 
+Função: Cadastro de ativos 
+• VIN (chave mestre) 
+• Plate 
+• Investor (link) 
+• Status 
+5.3 Tabela: Periods 
+Função: Dimensão temporal (competência) 
+• Period (YYYY-MM) 
+• Status (Open / Closed – opcional) 
+Pré-criada manualmente de 2025-10 até 2027-12. 
+5.4 Tabela: Monthly_Fixed_Costs 
+Função: Controle administrativo de custos fixos mensais por veículo. 
+Custos fixos não fazem parte do cálculo do resultado do contrato de investimento, mas permanecem no sistema para: 
+• Visão administrativa da Epic 
+• Análise de eficiência operacional 
+• Planejamento e forecast 
+Custos atuais por veículo/mês: 
+• Insurance: 180 USD 
+• Parking: 80 USD 
+• Carwash: 40 USD 
+• Total: 300 USD 
+Campos principais: 
+• Vehicle (link) 
+• Period (link) 
+• Insurance 
+• Parking 
+• Carwash 
+• Fixed_Cost_Total 
+5.5 Tabela: KPI_Monthly_By_Vehicle 
+Função: Tabela central de leitura financeira por ativo e competência. 
+Chave lógica: Vehicle + Period 
+Esta tabela consolida os dados vindos da Revenue-Trips e aplica a regra final do contrato. 
+Regra do contrato de investimento: 
+Gross Earnings Turo - Extras - Tolls - Parking 
+= Resultado Operacional 
+Resultado Operacional: - 60% Investidor - 40% Epic 
+Campos principais: 
+• Gross Earnings Turo (Monthly) 
+• Extras (Monthly) 
+• Tolls (Monthly) 
+• Parking (Monthly) 
+• Resultado Operacional 
+• Investor Share (60%) 
+• Epic Share (40%) 
+• Trip Count 
+• Trip Days 
+Custos fixos não impactam estes KPIs. 
+6. KPIs Oficiais 
+KPIs por Veículo / Mês 
+• Gross Earnings Turo 
+• Extras 
+• Tolls 
+• Parking 
+• Resultado Operacional 
+• Lucro do Investidor (60%) 
+• Receita Epic (40%) 
+KPIs Consolidados por Investidor / Mês 
+• Receita operacional total 
+• Lucro total do investidor 
+• Receita total da Epic 
+7. Consolidação e Automação 
+Estratégia escolhida 
+Opção A — Views consolidadas no Airtable (automático) 
+• Sem tabela adicional de consolidação 
+• Sem scripts de fechamento 
+• Views agrupadas por Investor + Period 
+Atualização 
+• Sempre automática 
+• Qualquer mudança na Turo reflete nos KPIs 
+8. Processo de Atualização Semanal (SOP) 
+1. Exportar CSV da Turo 
+2. Importar no Airtable → Merge with existing table 
+3. Match key: Trip ID 
+4. Update existing + Create new 
+5. Nunca deletar registros 
+Resultado: 
+• Trips novas entram 
+• Trips alteradas atualizam 
+• Histórico permanece consistente 
+9. Softr — Camada de Apresentação 
+Função 
+• Exibir dados 
+• Filtrar por investidor logado 
+• Alternar visões (carro a carro / consolidado) 
+Não faz 
+• Cálculos financeiros 
+• Lógica de fee 
+• Consolidação crítica 
+10. Fechamento Quarter a Quarter 
+• Processo manual 
+• Exportação de views do Airtable 
+• Geração de relatório estático (PDF / Excel) 
+• Não interfere na base viva 
+11. Riscos Conhecidos e Aceitos 
+• Números históricos podem mudar 
+• Cancelamentos retroativos afetam KPIs 
+• Plataforma reflete o presente, não snapshots 
+Aceito conscientemente por decisão de produto. 
+12. Critérios de Sucesso 
+• Investidor entende performance sem explicação extra 
+• Dados sempre atualizados 
+• Nenhuma manutenção manual recorrente 
+• Escalável para novos veículos e investidores 
+13. Status Atual 
+✔ Arquitetura definida 
+✔ Scripts críticos implementados 
+✔ Modelo validado 
+✔ Pronto para Softr UI 
+Owner: Epic Rental Car 
+Role: Product Owner 
+Version: 1.0 — Final 
+Status: Approved 

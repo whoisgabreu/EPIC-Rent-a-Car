@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Importar CSV | EPIC Rental{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <header class="mb-4">
+        <h1>Importar Dados Turo</h1>
+        <p class="text-muted">Selecione o arquivo CSV extraído da plataforma Turo para atualizar o dashboard.</p>
+    </header>
+
+    <div class="card">
+        <form action="{% url 'upload_csv' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="csv_file" class="form-label">Arquivo CSV de Ganhos</label>
+                <input type="file" name="csv_file" id="csv_file" class="form-control" accept=".csv" required>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    Certifique-se de que o arquivo segue o formato de exportação padrão da Turo.
+                </p>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                Iniciar Processamento
+            </button>
+        </form>
+    </div>
+
+    <div class="mb-4" style="margin-top: 2rem;">
+        <h3>Instruções</h3>
+        <ol style="padding-left: 1.5rem; margin-top: 1rem; color: var(--text-muted);">
+            <li class="mb-2">Vá para a seção de Ganhos (Earnings) na sua conta Turo.</li>
+            <li class="mb-2">Exporte o histórico de ganhos como um arquivo CSV.</li>
+            <li class="mb-2">Faça o upload do arquivo acima. O sistema processará novas viagens e atualizará as existentes.</li>
+        </ol>
+    </div>
+</div>
+{% endblock %}

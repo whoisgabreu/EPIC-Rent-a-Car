@@ -1,0 +1,16 @@
+name;investor;vehicle; ownership(%); invested_amount;start_date; investor_name(lookup); investment_duration(days); 
+2017 Jeep Compass;Ricardo Lima;1C4NJCBA1HD148236;100;$9,000.00;1/10/2025;Ricardo Lima;176
+2020 Chevrolet Malibu;Daniele Pieralisi;1G1ZD5ST5LF118751;100;$12,000.00;20/10/2025;Daniele Pieralisi;157
+2022 Chevrolet Malibu;Ricardo Lima;1G1ZD5ST9NF179636;100;$14,000.00;1/10/2025;Ricardo Lima;176
+2016 Cadillac Escalade;Ricardo Lima;1GYS3AKJ5GR367407;100;$16,000.00;1/10/2025;Ricardo Lima;176
+2021 Chrysler Pacifica;Ricardo Lima;2C4RC1BG4MR527646;100;$14,000.00;1/10/2025;Ricardo Lima;176
+2022 Chrysler Pacifica;Rafael Chagas;2C4RC1BG5MR591954;100;$14,000.00;1/10/2025;Rafael Chagas;176
+2017 Chrysler Pacifica;Michelle Senna;2C4RC1BG8HR692069;100;$10,000.00;1/10/2025;Michelle Senna;176
+2017 Ford Fusion Hybrid;Ricardo Lima;3FA6P0LU0HR357006;100;$10,000.00;1/10/2025;Ricardo Lima;176
+2019 Kia Sorento;Eduardo Lima;5XYPG4A52KG490739;100;$12,000.00;1/12/2025;Eduardo Lima;115
+2022 Mitsubishi Outlander;Roberto Cunha;JA4J3VA89NZ084250;100;$20,000.00;10/11/2025;Roberto Cunha;136
+2020 Buick Encore;Daniele Pieralisi;KL4CJASB2LB014127;100;$12,000.00;10/11/2025;Daniele Pieralisi;136
+2021 Kia Sedona;Ricardo Lima;KNDMB5C19M6662370;100;$11,800.00;15/1/2026;Ricardo Lima;70
+2019 VW Atlas;Ricardo Lima;1V2DR2CA3KC624222;100;$11,800.00;15/1/2026;Ricardo Lima;70
+2018 VW Tiguan;Ricardo Lima;3VV3B7AX9JM166500;100;$9,300.00;15/1/2026;Ricardo Lima;70
+2018 Jeep Gran Cherokee;Ricardo Lima;1C4RJEAG3JC339719;100;$9,800.00;15/1/2026;Ricardo Lima;70
