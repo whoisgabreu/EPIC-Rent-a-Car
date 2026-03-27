@@ -4,54 +4,115 @@
 {% block title %}Dashboard | EPIC Rental{% endblock %}
 
 {% block content %}
-<header class="mb-4">
-    <h1>Dashboard de Ganhos</h1>
-    <p class="text-muted">Visão geral da sua frota e desempenho na Turo.</p>
+<header class="mb-4" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1.5rem;">
+    <div>
+        <h1 style="font-size: 2.5rem; background: linear-gradient(135deg, var(--primary-dark), var(--primary-vibrant)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            {% if is_admin %}Painel Gerencial EPIC{% else %}Portal do Investidor{% endif %}
+        </h1>
+        <p class="text-muted" style="font-size: 1.1rem; margin-top: 0.5rem;">
+            {% if is_admin %}
+                {% if investor %}
+                    Visão detalhada: <strong>{{ investor.name }}</strong>
+                {% else %}
+                    Visão consolidada da operação global.
+                {% endif %}
+            {% else %}
+                Bem-vindo, <strong>{{ investor.name }}</strong>. Veja o desempenho da sua frota.
+            {% endif %}
+        </p>
+    </div>
+
+    {% if is_admin %}
+    <div class="filter-container">
+        <span style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--secondary);">Filtrar Investidor:</span>
+        <form action="" method="get" id="investorFilterForm">
+            <select name="investor_id" class="form-control" onchange="this.form.submit()" style="min-width: 250px;">
+                <option value="">-- Todos os Investidores --</option>
+                {% for inv in all_investors %}
+                <option value="{{ inv.id }}" {% if selected_investor_id == inv.id|stringformat:"s" %}selected{% endif %}>
+                    {{ inv.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+    {% endif %}
 </header>
 
-<!-- Stats Grid -->
+{% if not no_profile %}
+<!-- Main Metrics Grid -->
 <div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-label">Ganhos Totais</div>
-        <div class="stat-value">$ {{ total_earnings|floatformat:2|intcomma }}</div>
+    <div class="stat-card highlight-info">
+        <div class="stat-label">Receita Operacional Bruta</div>
+        <div class="stat-value">$ {{ metrics.gross_earnings|floatformat:2|intcomma }}</div>
+        <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">
+            ADR: <strong>$ {{ metrics.adr|floatformat:2|intcomma }}</strong> / dia
+        </div>
+    </div>
+    <div class="stat-card highlight-success">
+        <div class="stat-label">{% if is_admin and not investor %}Lucro Total Investidores (60%){% else %}Seu Lucro (60%){% endif %}</div>
+        <div class="stat-value">$ {{ metrics.investor_share|floatformat:2|intcomma }}</div>
+        <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">
+            Volume: <strong>{{ metrics.total_trips }}</strong> viagens em <strong>{{ metrics.total_days }}</strong> dias
+        </div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Total de Viagens</div>
-        <div class="stat-value">{{ total_trips }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Média por Viagem</div>
-        <div class="stat-value">$ {{ avg_earnings|floatformat:2|intcomma }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Total de Dias</div>
-        <div class="stat-value">{{ total_days }}</div>
+        <div class="stat-label">Comissão EPIC (40%)</div>
+        <div class="stat-value">$ {{ metrics.epic_share|floatformat:2|intcomma }}</div>
     </div>
 </div>
 
+<!-- Detailed Expenses Grid -->
 <div class="mb-4">
-    <div class="card">
-        <h2 class="mb-2">Ganhos por Veículo</h2>
-        <div class="table-container">
+    <h3 class="mb-2" style="font-size: 1.25rem; font-weight: 600; color: var(--primary-dark);">Detalhamento de Despesas (Deduções)</h3>
+    <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="stat-card" style="padding: 1.25rem; border-left: 4px solid var(--warning);">
+            <div class="stat-label" style="font-size: 0.65rem;">Pedágios (Tolls)</div>
+            <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.tolls|floatformat:2|intcomma }}</div>
+        </div>
+        <div class="stat-card" style="padding: 1.25rem; border-left: 4px solid var(--warning);">
+            <div class="stat-label" style="font-size: 0.65rem;">Estacionamento (Parking)</div>
+            <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.parking|floatformat:2|intcomma }}</div>
+        </div>
+        <div class="stat-card" style="padding: 1.25rem; border-left: 4px solid var(--warning);">
+            <div class="stat-label" style="font-size: 0.65rem;">Lavagem (Cleaning)</div>
+            <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.cleaning|floatformat:2|intcomma }}</div>
+        </div>
+        <div class="stat-card" style="padding: 1.25rem; border-left: 4px solid var(--warning);">
+            <div class="stat-label" style="font-size: 0.65rem;">Combustível (Gas)</div>
+            <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.gas|floatformat:2|intcomma }}</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="mb-4">
+    <div class="card" style="padding: 1.5rem;">
+        <h2 class="mb-2" style="font-size: 1.5rem; color: var(--primary-dark);">Desempenho por Veículo</h2>
+        <div class="table-container" style="border: none; box-shadow: none;">
             <table>
                 <thead>
                     <tr>
                         <th>Veículo</th>
-                        <th>Viagens</th>
-                        <th>Ganhos Totais</th>
+                        <th>Placa</th>
+                        <th style="text-align: center;">Viagens</th>
+                        <th style="text-align: right;">Resultado Op.</th>
+                        <th style="text-align: right;">{% if is_admin %}Lucro Investidor{% else %}Seu Lucro (60%){% endif %}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for stat in vehicle_stats %}
-                    <tr>
-                        <td><strong>{{ stat.vehicle_name }}</strong></td>
-                        <td>{{ stat.count }}</td>
-                        <td>$ {{ stat.earnings|floatformat:2|intcomma }}</td>
+                    <tr style="transition: background 0.2s;">
+                        <td><strong>{{ stat.name }}</strong><br><small class="text-muted">{{ stat.vin }}</small></td>
+                        <td><code>{{ stat.plate }}</code></td>
+                        <td style="text-align: center;">{{ stat.trips }}</td>
+                        <td style="text-align: right;">$ {{ stat.earnings|floatformat:2|intcomma }}</td>
+                        <td style="text-align: right;"><strong style="color: var(--success);">$ {{ stat.investor_share|floatformat:2|intcomma }}</strong></td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="3" style="text-align: center; padding: 2rem; color: var(--text-muted);">
-                            Nenhum dado disponível. Importe um arquivo CSV para começar.
+                        <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            Nenhum dado disponível.
                         </td>
                     </tr>
                     {% endfor %}
@@ -61,9 +122,9 @@
     </div>
 </div>
 
-<div class="card">
-    <h2 class="mb-2">Viagens Recentes</h2>
-    <div class="table-container">
+<div class="card" style="padding: 1.5rem;">
+    <h2 class="mb-2" style="font-size: 1.5rem; color: var(--primary-dark);">Viagens Recentes</h2>
+    <div class="table-container" style="border: none; box-shadow: none;">
         <table>
             <thead>
                 <tr>
@@ -72,7 +133,7 @@
                     <th>Hóspede</th>
                     <th>Início</th>
                     <th>Status</th>
-                    <th>Ganhos</th>
+                    <th style="text-align: right;">Ganhos</th>
                 </tr>
             </thead>
             <tbody>
@@ -81,17 +142,17 @@
                     <td><code>{{ trip.reservation_id }}</code></td>
                     <td>{{ trip.vehicle_name }}</td>
                     <td>{{ trip.guest }}</td>
-                    <td>{{ trip.trip_start|date:"d/m/Y H:i" }}</td>
+                    <td>{{ trip.start_date|date:"d/m/Y H:i" }}</td>
                     <td>
                         <span class="badge badge-{{ trip.trip_status|lower|slugify }}">
                             {{ trip.trip_status }}
                         </span>
                     </td>
-                    <td><strong>$ {{ trip.total_earnings|floatformat:2|intcomma }}</strong></td>
+                    <td style="text-align: right;"><strong>$ {{ trip.total_earnings|floatformat:2|intcomma }}</strong></td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                    <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
                         Nenhuma viagem encontrada.
                     </td>
                 </tr>

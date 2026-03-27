@@ -7,15 +7,16 @@
     --success: #10b981;
     --danger: #ef4444;
     --warning: #f59e0b;
-    --bg-body: #f1f5f9;
+    --bg-body: #f8fafc;
     --bg-card: #ffffff;
-    --text-main: #292F30;
+    --bg-glass: rgba(255, 255, 255, 0.7);
+    --text-main: #1e293b;
     --text-muted: #64748b;
     --border: #e2e8f0;
-    --radius: 8px;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --radius: 12px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-premium: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
 }
 
 * {
@@ -116,31 +117,40 @@ header p {
     background: var(--bg-card);
     border-radius: var(--radius);
     border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-    padding: 2rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: var(--shadow-premium);
+    padding: 2.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .card:hover {
-    box-shadow: var(--shadow);
+    transform: translateY(-4px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
 }
 
 /* Stats Grid */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
     margin-bottom: 3rem;
 }
 
 .stat-card {
-    background: var(--bg-card);
-    padding: 2rem;
+    background: var(--bg-glass);
+    padding: 1.75rem;
     border-radius: var(--radius);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: var(--shadow-premium);
     position: relative;
     overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    background: var(--bg-card);
+    transform: scale(1.02);
 }
 
 .stat-card::before {
@@ -148,9 +158,10 @@ header p {
     position: absolute;
     top: 0;
     left: 0;
-    width: 4px;
+    width: 6px;
     height: 100%;
-    background-color: var(--primary);
+    background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+    border-radius: 0 4px 4px 0;
 }
 
 .stat-label {
@@ -258,4 +269,73 @@ tr:hover td {
     color: var(--secondary);
     font-size: 0.875rem;
     text-align: center;
+}
+
+/* New Component Styles */
+.btn-logout {
+    text-decoration: none;
+    color: var(--danger);
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--danger);
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.btn-logout:hover {
+    background-color: var(--danger);
+    color: white;
+}
+
+.stat-card.highlight-success::before {
+    background: linear-gradient(to bottom, #10b981, #059669);
+}
+
+.stat-card.highlight-success .stat-value {
+    color: #059669;
+}
+
+.stat-card.highlight-info::before {
+    background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+}
+
+.stat-card.highlight-info .stat-value {
+    color: #1d4ed8;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background-color: white;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    color: var(--text-main);
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 101, 183, 0.1);
+}
+
+.filter-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    background: var(--bg-glass);
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+}
+
+.text-danger {
+    color: var(--danger);
 }

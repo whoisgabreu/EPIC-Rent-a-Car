@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | EPIC Rental{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+    <div class="card" style="width: 100%; max-width: 400px; padding: 2.5rem;">
+        <h1 style="text-align: center; margin-bottom: 2rem; font-size: 1.75rem;">Acesso ao Portal</h1>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div style="background-color: #fee2e2; color: #b91c1c; padding: 0.75rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.875rem;">
+                Usuário ou senha inválidos.
+            </div>
+            {% endif %}
+
+            <div class="mb-4">
+                <label for="id_username" class="mb-1" style="display: block; font-weight: 500;">Email</label>
+                <input type="text" name="username" id="id_username" class="form-control" required style="width: 100%;">
+            </div>
+
+            <div class="mb-4">
+                <label for="id_password" class="mb-1" style="display: block; font-weight: 500;">Senha</label>
+                <input type="password" name="password" id="id_password" class="form-control" required style="width: 100%;">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-weight: 600; margin-top: 1rem;">
+                Entrar
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 2rem; font-size: 0.875rem; color: var(--text-muted);">
+            EPIC Rental Car &copy; 2026
+        </div>
+    </div>
+</div>
+{% endblock %}

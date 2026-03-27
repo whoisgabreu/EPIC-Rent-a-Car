@@ -1,10 +1,110 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+class Investor(models.Model):
+    user = models.OneToOneField(User, related_name='investor_profile', on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=255, unique=True, verbose_name="Nome do Investidor")
+    status = models.CharField(max_length=50, default='Active', verbose_name="Status")
+    total_invested = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Total Investido")
+    
+    class Meta:
+        verbose_name = "Investidor"
+        verbose_name_plural = "Investidores"
+
+    def __str__(self):
+        return self.name
+
+class Vehicle(models.Model):
+    vin = models.CharField(max_length=50, unique=True, verbose_name="VIN")
+    plate = models.CharField(max_length=20, verbose_name="Placa")
+    year_make_model = models.CharField(max_length=255, verbose_name="Ano/Marca/Modelo")
+    investor = models.ForeignKey(Investor, on_delete=models.CASCADE, related_name='owned_vehicles', verbose_name="Investidor")
+    status = models.CharField(max_length=50, default='Active', verbose_name="Status")
+    acquisition_date = models.DateField(null=True, blank=True, verbose_name="Data de Aquisição")
+    
+    class Meta:
+        verbose_name = "Veículo"
+        verbose_name_plural = "Veículos"
+
+    def __str__(self):
+        return f"{self.year_make_model} ({self.plate})"
+
+class Period(models.Model):
+    period_key = models.CharField(max_length=20, unique=True, verbose_name="Chave do Período (AAAA-MM)")
+    start_date = models.DateField(verbose_name="Data de Início")
+    end_date = models.DateField(verbose_name="Data de Fim")
+
+    class Meta:
+        verbose_name = "Período"
+        verbose_name_plural = "Períodos"
+        ordering = ['-start_date']
+
+    def __str__(self):
+        return self.period_key
+
+class Investment(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Nome do Investimento")
+    investor = models.ForeignKey(Investor, on_delete=models.CASCADE, related_name='investments', verbose_name="Investidor")
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='investments', verbose_name="Veículo")
+    ownership_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=100.00, verbose_name="Porcentagem de Propriedade (%)")
+    invested_amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Valor Investido")
+    start_date = models.DateField(verbose_name="Data de Início")
+    duration_days = models.IntegerField(null=True, blank=True, verbose_name="Duração (Dias)")
+
+    class Meta:
+        verbose_name = "Investimento"
+        verbose_name_plural = "Investimentos"
+
+    def __str__(self):
+        return f"{self.name} - {self.investor.name}"
+
+class Expense(models.Model):
+    EXPENSE_TYPES = [
+        ('Maintenance', 'Manutenção'),
+        ('Repair', 'Reparo'),
+        ('Cleaning', 'Limpeza'),
+        ('Gas', 'Combustível'),
+        ('Insurance', 'Seguro'),
+        ('Other', 'Outros'),
+    ]
+    name = models.CharField(max_length=255, verbose_name="Nome da Despesa")
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='expenses', verbose_name="Veículo")
+    period = models.ForeignKey(Period, on_delete=models.SET_NULL, null=True, blank=True, related_name='expenses', verbose_name="Período")
+    expense_type = models.CharField(max_length=50, choices=EXPENSE_TYPES, verbose_name="Tipo de Despesa")
+    date = models.DateField(verbose_name="Data")
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Valor")
+    description = models.TextField(null=True, blank=True, verbose_name="Descrição")
+    status = models.CharField(max_length=50, default='Approved', verbose_name="Status")
+    payment_status = models.CharField(max_length=50, default='Paid', verbose_name="Status do Pagamento")
+
+    class Meta:
+        verbose_name = "Despesa"
+        verbose_name_plural = "Despesas"
+
+    def __str__(self):
+        return f"{self.name} - {self.vehicle.plate} ({self.amount})"
+
+class Toll(models.Model):
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='tolls', verbose_name="Veículo")
+    period = models.ForeignKey(Period, on_delete=models.SET_NULL, null=True, blank=True, related_name='tolls', verbose_name="Período")
+    plate = models.CharField(max_length=20, verbose_name="Placa")
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Valor")
+    date = models.DateField(verbose_name="Data")
+
+    class Meta:
+        verbose_name = "Pedágio"
+        verbose_name_plural = "Pedágios"
+
+    def __str__(self):
+        return f"Toll {self.vehicle.plate} - {self.date}"
 
 class TuroTrip(models.Model):
     # Basic Info
     reservation_id = models.CharField(max_length=50, unique=True, verbose_name="ID da Reserva")
     guest = models.CharField(max_length=255, verbose_name="Hóspede")
-    vehicle = models.CharField(max_length=255, verbose_name="Veículo")
+    vehicle_str = models.CharField(max_length=255, default='', verbose_name="Veículo (Texto)")
+    vehicle_obj = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True, related_name='trips', verbose_name="Veículo Relacionado")
+    period_obj = models.ForeignKey(Period, on_delete=models.SET_NULL, null=True, blank=True, related_name='trips', verbose_name="Período Relacionado")
     vehicle_name = models.CharField(max_length=255, verbose_name="Nome do Veículo")
     vehicle_id = models.CharField(max_length=50, verbose_name="ID do Veículo")
     vin = models.CharField(max_length=50, verbose_name="VIN")

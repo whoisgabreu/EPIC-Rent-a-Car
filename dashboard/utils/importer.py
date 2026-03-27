@@ -3,7 +3,7 @@ from decimal import Decimal
 from datetime import datetime
 from django.utils import timezone
 from django.db import transaction
-from ..models import TuroTrip
+from ..models import TuroTrip, Vehicle, Period
 
 def parse_decimal(value):
     if not value or value.strip() == "":
@@ -18,7 +18,7 @@ def parse_datetime(value):
     if not value or not isinstance(value, str) or value.strip() == "":
         return None
     # Possible formats: "2026-02-14 10:00 AM" or "2026-02-14 10:00:00"
-    formats = ["%Y-%m-%d %I:%M %p", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"]
+    formats = ["%Y-%m-%d %I:%M %p", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%m/%d/%Y %I:%M %p"]
     for fmt in formats:
         try:
             return datetime.strptime(value.strip(), fmt)
@@ -44,26 +44,48 @@ def import_turo_csv(file_obj):
     if content:
         content[0] = content[0].lstrip('\ufeff')
 
-    # Use skipinitialspace=True to handle "Guest", " Vehicle"
     reader = csv.DictReader(content, skipinitialspace=True)
     
     with transaction.atomic():
-        # Step 1: Wipe all existing records as per new requirement
         TuroTrip.objects.all().delete()
         
         count = 0
         for row in reader:
-            # Clean row keys: remove surrounding quotes and extra spaces
             clean_row = {k.strip().replace('"', ''): v for k, v in row.items() if k}
             
+            start_dt = parse_datetime(clean_row.get('Trip start'))
+            end_dt = parse_datetime(clean_row.get('Trip end'))
+            vin = clean_row.get('VIN', '').strip()
+            
+            # Find related vehicle
+            vehicle_obj = Vehicle.objects.filter(vin=vin).first()
+            
+            # Find or create related period
+            period_obj = None
+            if start_dt:
+                period_key = start_dt.strftime('%Y-%m')
+                period_obj = Period.objects.filter(period_key=period_key).first()
+                if not period_obj:
+                    # Optional: Automatically create period if missing
+                    from datetime import date, timedelta
+                    import calendar
+                    last_day = calendar.monthrange(start_dt.year, start_dt.month)[1]
+                    period_obj = Period.objects.create(
+                        period_key=period_key,
+                        start_date=date(start_dt.year, start_dt.month, 1),
+                        end_date=date(start_dt.year, start_dt.month, last_day)
+                    )
+
             trip_data = {
                 'guest': clean_row.get('Guest', '').strip(),
-                'vehicle': clean_row.get('Vehicle', '').strip(),
+                'vehicle_str': clean_row.get('Vehicle', '').strip(), # Renamed
+                'vehicle_obj': vehicle_obj,
+                'period_obj': period_obj,
                 'vehicle_name': clean_row.get('Vehicle name', '').strip(),
                 'vehicle_id': clean_row.get('Vehicle id', '').strip(),
-                'vin': clean_row.get('VIN', '').strip(),
-                'start_date': parse_datetime(clean_row.get('Trip start')),
-                'end_date': parse_datetime(clean_row.get('Trip end')),
+                'vin': vin,
+                'start_date': start_dt,
+                'end_date': end_dt,
                 'pickup_location': clean_row.get('Pickup location', '').strip(),
                 'return_location': clean_row.get('Return location', '').strip(),
                 'trip_status': clean_row.get('Trip status', '').strip(),
@@ -115,5 +137,7 @@ def import_turo_csv(file_obj):
                     **trip_data
                 )
                 count += 1
+            
+    return count
             
     return count
