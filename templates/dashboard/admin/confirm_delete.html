@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Deletion — EPIC Admin{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <div class="confirm-delete-card">
+        <div class="confirm-delete-icon">⚠️</div>
+        <h2 class="confirm-delete-title">Confirm Deletion</h2>
+        <p class="confirm-delete-msg">
+            You are about to delete the {{ object_type }}:<br>
+            <strong>{{ object }}</strong>
+        </p>
+        <p class="confirm-delete-warning">This action <strong>cannot be undone</strong>.</p>
+
+        <form method="post" class="confirm-delete-actions">
+            {% csrf_token %}
+            <a href="{{ cancel_url }}" class="btn btn-ghost">Cancel</a>
+            <button type="submit" class="btn btn-danger">Yes, delete</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

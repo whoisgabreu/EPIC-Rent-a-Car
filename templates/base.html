@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,27 +9,39 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     {% block extra_head %}{% endblock %}
 </head>
+
 <body>
     <nav class="navbar">
         <div class="container">
-            <a href="{% url 'dashboard' %}" class="logo">EPIC <span>Rental</span></a>
+            <a href="{% url 'dashboard' %}" class="logo"><img src="{% static 'image/logo2.png' %}" alt="EPIC Rental"
+                    style="max-height: 50px;"></a>
             <ul class="nav-links">
                 {% if user.is_authenticated %}
-                <li><a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a></li>
+                <li><a href="{% url 'dashboard' %}"
+                        class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+                </li>
                 {% if user.is_staff %}
-                <li><a href="{% url 'upload_csv' %}" class="{% if request.resolver_match.url_name == 'upload_csv' %}active{% endif %}">Importar CSV</a></li>
+                <li><a href="{% url 'admin_panel' %}" class="{% if 'admin-panel' in request.path %}active{% endif %}">⚙
+                        Admin</a></li>
+                <li><a href="{% url 'upload_csv' %}"
+                        class="{% if request.resolver_match.url_name == 'upload_csv' %}active{% endif %}">Import CSV</a>
+                </li>
                 {% endif %}
                 <li>
                     <form action="{% url 'logout' %}" method="post" style="display: inline;">
                         {% csrf_token %}
-                        <button type="submit" class="btn-logout" style="background: none; border: none; cursor: pointer; padding: 0.5rem 1rem;">Sair</button>
+                        <button type="submit" class="btn-logout"
+                            style="background: none; border: none; cursor: pointer; padding: 0.5rem 1rem;">Log
+                            Out</button>
                     </form>
                 </li>
                 {% else %}
-                <li><a href="{% url 'login' %}">Entrar</a></li>
+                <li><a href="{% url 'login' %}">Log In</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -36,13 +49,13 @@
 
     <main class="container content">
         {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="alert {{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
             </div>
+            {% endfor %}
+        </div>
         {% endif %}
 
         {% block content %}{% endblock %}
@@ -50,10 +63,11 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2026 EPIC Rental Car. Todos os direitos reservados.</p>
+            <p>&copy; 2026 EPIC Rental Car. All rights reserved.</p>
         </div>
     </footer>
 
     {% block extra_js %}{% endblock %}
 </body>
+
 </html>

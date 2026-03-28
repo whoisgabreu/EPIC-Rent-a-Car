@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Vehicles — EPIC Admin{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <div class="page-header">
+        <div>
+            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › Vehicles</nav>
+            <h1 class="page-title">Vehicles</h1>
+        </div>
+        <a href="{% url 'admin_vehicle_create' %}" class="btn btn-primary">+ New Vehicle</a>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="search-bar">
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search by model, plate, or VIN..." class="search-input">
+        <select name="investor_id" class="form-select" onchange="this.form.submit()">
+            <option value="">All Investors</option>
+            {% for inv in all_investors %}
+            <option value="{{ inv.pk }}" {% if selected_investor_id == inv.pk|stringformat:"s" %}selected{% endif %}>{{ inv.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-secondary">Search</button>
+        {% if request.GET.q or selected_investor_id %}<a href="{% url 'admin_vehicle_list' %}" class="btn btn-ghost">Clear</a>{% endif %}
+    </form>
+
+    <!-- Table -->
+    <div class="table-card">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Vehicle</th>
+                    <th>License Plate</th>
+                    <th>VIN</th>
+                    <th>Investor</th>
+                    <th>Status</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in vehicles %}
+                <tr>
+                    <td><strong>{{ v.year_make_model }}</strong></td>
+                    <td><span class="vehicle-plate">{{ v.plate }}</span></td>
+                    <td><code class="vin-code">{{ v.vin }}</code></td>
+                    <td>
+                        {% if v.investor %}
+                            <a href="{% url 'admin_investor_edit' v.investor.pk %}">{{ v.investor.name }}</a>
+                        {% else %}<span class="text-muted">—</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if v.status == 'Active' %}<span class="badge badge-green">Active</span>
+                        {% elif v.status == 'Maintenance' %}<span class="badge badge-yellow">Maintenance</span>
+                        {% else %}<span class="badge badge-gray">Inactive</span>{% endif %}
+                    </td>
+                    <td class="text-right actions-cell">
+                        <a href="{% url 'admin_vehicle_edit' v.pk %}" class="btn-action btn-action--edit" title="Edit">✏️</a>
+                        <a href="{% url 'admin_vehicle_delete' v.pk %}" class="btn-action btn-action--delete" title="Delete">🗑️</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="table-empty">No vehicles found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-ghost">‹ Previous</a>{% endif %}
+        <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-ghost">Next ›</a>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

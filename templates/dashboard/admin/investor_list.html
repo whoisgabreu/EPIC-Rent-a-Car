@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Investors — EPIC Admin{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <div class="page-header">
+        <div>
+            <nav class="breadcrumb"><a href="{% url 'admin_panel' %}">Admin</a> › Investors</nav>
+            <h1 class="page-title">Investors</h1>
+        </div>
+        <a href="{% url 'admin_investor_create' %}" class="btn btn-primary">+ New Investor</a>
+    </div>
+
+    <!-- Search -->
+    <form method="get" class="search-bar">
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search investor..." class="search-input">
+        <button type="submit" class="btn btn-secondary">Search</button>
+        {% if request.GET.q %}<a href="{% url 'admin_investor_list' %}" class="btn btn-ghost">Clear</a>{% endif %}
+    </form>
+
+    <!-- Table -->
+    <div class="table-card">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Investor</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Vehicles</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for investor in investors %}
+                <tr>
+                    <td><strong>{{ investor.name }}</strong></td>
+                    <td>
+                        {% if investor.user %}
+                            <span class="badge badge-green">{{ investor.user.username }}</span>
+                        {% else %}
+                            <span class="badge badge-red">No login</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if investor.status == 'Active' %}
+                            <span class="badge badge-green">Active</span>
+                        {% else %}
+                            <span class="badge badge-gray">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="vehicle-tags">
+                            {% for v in investor.owned_vehicles.all %}
+                                <span class="vehicle-tag">{{ v.plate }}</span>
+                            {% empty %}
+                                <span class="text-muted">None</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td class="text-right actions-cell">
+                        <a href="{% url 'admin_investor_edit' investor.pk %}" class="btn-action btn-action--edit" title="Edit">✏️</a>
+                        <a href="{% url 'admin_investor_delete' investor.pk %}" class="btn-action btn-action--delete" title="Delete">🗑️</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="table-empty">No investors found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-ghost">‹ Previous</a>{% endif %}
+        <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-ghost">Next ›</a>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

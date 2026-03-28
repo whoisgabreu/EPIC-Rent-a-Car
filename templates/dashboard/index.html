@@ -7,27 +7,27 @@
 <header class="mb-4" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1.5rem;">
     <div>
         <h1 style="font-size: 2.5rem; background: linear-gradient(135deg, var(--primary-dark), var(--primary-vibrant)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            {% if is_admin %}Painel Gerencial EPIC{% else %}Portal do Investidor{% endif %}
+            {% if is_admin %}EPIC Management Dashboard{% else %}Investor Portal{% endif %}
         </h1>
         <p class="text-muted" style="font-size: 1.1rem; margin-top: 0.5rem;">
             {% if is_admin %}
                 {% if investor %}
-                    Visão detalhada: <strong>{{ investor.name }}</strong>
+                    Detailed view: <strong>{{ investor.name }}</strong>
                 {% else %}
-                    Visão consolidada da operação global.
+                    Consolidated view of global operations.
                 {% endif %}
             {% else %}
-                Bem-vindo, <strong>{{ investor.name }}</strong>. Veja o desempenho da sua frota.
+                Welcome, <strong>{{ investor.name }}</strong>. Track your fleet's performance.
             {% endif %}
         </p>
     </div>
 
     {% if is_admin %}
     <div class="filter-container">
-        <span style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--secondary);">Filtrar Investidor:</span>
+        <span style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--secondary);">Filter Investor:</span>
         <form action="" method="get" id="investorFilterForm">
             <select name="investor_id" class="form-control" onchange="this.form.submit()" style="min-width: 250px;">
-                <option value="">-- Todos os Investidores --</option>
+                <option value="">-- All Investors --</option>
                 {% for inv in all_investors %}
                 <option value="{{ inv.id }}" {% if selected_investor_id == inv.id|stringformat:"s" %}selected{% endif %}>
                     {{ inv.name }}
@@ -43,43 +43,43 @@
 <!-- Main Metrics Grid -->
 <div class="stats-grid">
     <div class="stat-card highlight-info">
-        <div class="stat-label">Receita Operacional Bruta</div>
+        <div class="stat-label">Gross Operating Revenue</div>
         <div class="stat-value">$ {{ metrics.gross_earnings|floatformat:2|intcomma }}</div>
         <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">
             ADR: <strong>$ {{ metrics.adr|floatformat:2|intcomma }}</strong> / dia
         </div>
     </div>
     <div class="stat-card highlight-success">
-        <div class="stat-label">{% if is_admin and not investor %}Lucro Total Investidores (60%){% else %}Seu Lucro (60%){% endif %}</div>
+        <div class="stat-label">{% if is_admin and not investor %}Total Investors Profit (60%){% else %}Your Profit (60%){% endif %}</div>
         <div class="stat-value">$ {{ metrics.investor_share|floatformat:2|intcomma }}</div>
         <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">
-            Volume: <strong>{{ metrics.total_trips }}</strong> viagens em <strong>{{ metrics.total_days }}</strong> dias
+            Volume: <strong>{{ metrics.total_trips }}</strong> trips in <strong>{{ metrics.total_days }}</strong> days
         </div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Comissão EPIC (40%)</div>
+        <div class="stat-label">EPIC Commission (40%)</div>
         <div class="stat-value">$ {{ metrics.epic_share|floatformat:2|intcomma }}</div>
     </div>
 </div>
 
 <!-- Detailed Expenses Grid -->
 <div class="mb-4">
-    <h3 class="mb-2" style="font-size: 1.25rem; font-weight: 600; color: var(--primary-dark);">Detalhamento de Despesas (Deduções)</h3>
+    <h3 class="mb-2" style="font-size: 1.25rem; font-weight: 600; color: var(--primary-dark);">Expense Breakdown (Deductions)</h3>
     <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
         <div class="stat-card" style="padding: 1.25rem; border-left: 4px solid var(--warning);">
-            <div class="stat-label" style="font-size: 0.65rem;">Pedágios (Tolls)</div>
+            <div class="stat-label" style="font-size: 0.65rem;">Tolls</div>
             <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.tolls|floatformat:2|intcomma }}</div>
         </div>
         <div class="stat-card" style="padding: 1.25rem; border-left: 4px solid var(--warning);">
-            <div class="stat-label" style="font-size: 0.65rem;">Estacionamento (Parking)</div>
+            <div class="stat-label" style="font-size: 0.65rem;">Parking</div>
             <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.parking|floatformat:2|intcomma }}</div>
         </div>
         <div class="stat-card" style="padding: 1.25rem; border-left: 4px solid var(--warning);">
-            <div class="stat-label" style="font-size: 0.65rem;">Lavagem (Cleaning)</div>
+            <div class="stat-label" style="font-size: 0.65rem;">Cleaning</div>
             <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.cleaning|floatformat:2|intcomma }}</div>
         </div>
         <div class="stat-card" style="padding: 1.25rem; border-left: 4px solid var(--warning);">
-            <div class="stat-label" style="font-size: 0.65rem;">Combustível (Gas)</div>
+            <div class="stat-label" style="font-size: 0.65rem;">Gas</div>
             <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.gas|floatformat:2|intcomma }}</div>
         </div>
     </div>
@@ -88,16 +88,16 @@
 
 <div class="mb-4">
     <div class="card" style="padding: 1.5rem;">
-        <h2 class="mb-2" style="font-size: 1.5rem; color: var(--primary-dark);">Desempenho por Veículo</h2>
+        <h2 class="mb-2" style="font-size: 1.5rem; color: var(--primary-dark);">Performance by Vehicle</h2>
         <div class="table-container" style="border: none; box-shadow: none;">
             <table>
                 <thead>
                     <tr>
-                        <th>Veículo</th>
-                        <th>Placa</th>
-                        <th style="text-align: center;">Viagens</th>
-                        <th style="text-align: right;">Resultado Op.</th>
-                        <th style="text-align: right;">{% if is_admin %}Lucro Investidor{% else %}Seu Lucro (60%){% endif %}</th>
+                        <th>Vehicle</th>
+                        <th>License Plate</th>
+                        <th style="text-align: center;">Trips</th>
+                        <th style="text-align: right;">Op. Result</th>
+                        <th style="text-align: right;">{% if is_admin %}Investor Profit{% else %}Your Profit (60%){% endif %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,7 +112,7 @@
                     {% empty %}
                     <tr>
                         <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-                            Nenhum dado disponível.
+                            No data available.
                         </td>
                     </tr>
                     {% endfor %}
@@ -123,17 +123,17 @@
 </div>
 
 <div class="card" style="padding: 1.5rem;">
-    <h2 class="mb-2" style="font-size: 1.5rem; color: var(--primary-dark);">Viagens Recentes</h2>
+    <h2 class="mb-2" style="font-size: 1.5rem; color: var(--primary-dark);">Recent Trips</h2>
     <div class="table-container" style="border: none; box-shadow: none;">
         <table>
             <thead>
                 <tr>
-                    <th>ID Reserva</th>
-                    <th>Veículo</th>
-                    <th>Hóspede</th>
-                    <th>Início</th>
+                    <th>Reservation ID</th>
+                    <th>Vehicle</th>
+                    <th>Guest</th>
+                    <th>Start Date</th>
                     <th>Status</th>
-                    <th style="text-align: right;">Ganhos</th>
+                    <th style="text-align: right;">Earnings</th>
                 </tr>
             </thead>
             <tbody>
@@ -153,7 +153,7 @@
                 {% empty %}
                 <tr>
                     <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-                        Nenhuma viagem encontrada.
+                        No trips found.
                     </td>
                 </tr>
                 {% endfor %}
