@@ -7,27 +7,27 @@ from .models import Investor, Vehicle
 
 class UserCreateForm(forms.ModelForm):
     password = forms.CharField(
-        label="Senha",
-        widget=forms.PasswordInput(attrs={'placeholder': 'Mínimo 8 caracteres'}),
+        label="Password",
+        widget=forms.PasswordInput(attrs={'placeholder': 'Minimum 8 characters'}),
         min_length=8
     )
     confirm_password = forms.CharField(
-        label="Confirmar Senha",
-        widget=forms.PasswordInput(attrs={'placeholder': 'Repita a senha'})
+        label="Confirm Password",
+        widget=forms.PasswordInput(attrs={'placeholder': 'Repeat the password'})
     )
-    is_staff = forms.BooleanField(label="Perfil Administrador", required=False)
+    is_staff = forms.BooleanField(label="Administrator Profile", required=False)
 
     class Meta:
         model = User
         fields = ['username', 'email', 'is_staff']
-        labels = {'username': 'Nome de usuário', 'email': 'E-mail'}
+        labels = {'username': 'Username', 'email': 'Email'}
 
     def clean(self):
         cleaned = super().clean()
         pw = cleaned.get('password')
         cpw = cleaned.get('confirm_password')
         if pw and cpw and pw != cpw:
-            self.add_error('confirm_password', 'As senhas não coincidem.')
+            self.add_error('confirm_password', 'Passwords do not match.')
         return cleaned
 
     def save(self, commit=True):
@@ -40,17 +40,17 @@ class UserCreateForm(forms.ModelForm):
 
 class UserUpdateForm(forms.ModelForm):
     new_password = forms.CharField(
-        label="Nova Senha (opcional)",
-        widget=forms.PasswordInput(attrs={'placeholder': 'Deixe em branco para manter'}),
+        label="New Password (optional)",
+        widget=forms.PasswordInput(attrs={'placeholder': 'Leave blank to keep current'}),
         required=False
     )
-    is_staff = forms.BooleanField(label="Perfil Administrador", required=False)
-    is_active = forms.BooleanField(label="Usuário Ativo", required=False)
+    is_staff = forms.BooleanField(label="Administrator Profile", required=False)
+    is_active = forms.BooleanField(label="Active User", required=False)
 
     class Meta:
         model = User
         fields = ['username', 'email', 'is_staff', 'is_active']
-        labels = {'username': 'Nome de usuário', 'email': 'E-mail'}
+        labels = {'username': 'Username', 'email': 'Email'}
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -67,18 +67,18 @@ class UserUpdateForm(forms.ModelForm):
 class InvestorForm(forms.ModelForm):
     user = forms.ModelChoiceField(
         queryset=User.objects.filter(investor_profile__isnull=True) | User.objects.none(),
-        label="Usuário vinculado",
+        label="Linked User",
         required=False,
-        empty_label="— Nenhum usuário —"
+        empty_label="— No user —"
     )
-    STATUS_CHOICES = [('Active', 'Ativo'), ('Inactive', 'Inativo')]
+    STATUS_CHOICES = [('Active', 'Active'), ('Inactive', 'Inactive')]
     status = forms.ChoiceField(choices=STATUS_CHOICES, label="Status")
 
     class Meta:
         model = Investor
         fields = ['name', 'status', 'user']
         labels = {
-            'name': 'Nome do Investidor',
+            'name': 'Investor Name',
         }
 
 
@@ -99,7 +99,7 @@ class InvestorForm(forms.ModelForm):
 # ─── Vehicle Forms ─────────────────────────────────────────────────────────────
 
 class VehicleForm(forms.ModelForm):
-    STATUS_CHOICES = [('Active', 'Ativo'), ('Inactive', 'Inativo'), ('Maintenance', 'Manutenção')]
+    STATUS_CHOICES = [('Active', 'Active'), ('Inactive', 'Inactive'), ('Maintenance', 'Maintenance')]
     status = forms.ChoiceField(choices=STATUS_CHOICES, label="Status")
 
     class Meta:
@@ -107,10 +107,10 @@ class VehicleForm(forms.ModelForm):
         fields = ['vin', 'plate', 'year_make_model', 'investor', 'status', 'acquisition_date']
         labels = {
             'vin': 'VIN',
-            'plate': 'Placa',
-            'year_make_model': 'Ano / Marca / Modelo',
-            'investor': 'Investidor',
-            'acquisition_date': 'Data de Aquisição',
+            'plate': 'License Plate',
+            'year_make_model': 'Year / Make / Model',
+            'investor': 'Investor',
+            'acquisition_date': 'Acquisition Date',
         }
         widgets = {
             'acquisition_date': forms.DateInput(attrs={'type': 'date'}),

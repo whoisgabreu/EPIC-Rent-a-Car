@@ -1,0 +1,10 @@
+O sistema reconheceu um veiculo não cadastrado com o VIN WDDGF4HB9EA966641, no CSV ele tem a placa "77FPQF" mas no sistema ele coletou "None"
+
+Rafael's Mercedes-Benz (FL #77FPQF)	WDDGF4HB9EA966641
+
+
+
+----------------------------------------
+
+
+Alguns cards estão com bordas duplas à esquerda.

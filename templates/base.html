@@ -34,6 +34,9 @@
                 </li>
                 {% endif %}
                 <li>
+                    <a href="{% url 'password_change' %}" class="{% if request.resolver_match.url_name == 'password_change' %}active{% endif %}" style="display: inline-block;">Change Password</a>
+                </li>
+                <li>
                     <form action="{% url 'logout' %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn-logout"
