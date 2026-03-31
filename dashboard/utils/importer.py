@@ -1,4 +1,5 @@
 import csv
+import re
 from decimal import Decimal
 from datetime import datetime
 from django.utils import timezone
@@ -34,6 +35,34 @@ def parse_int(value):
     except:
         return None
 
+def extract_plate(vehicle_str):
+    if not vehicle_str:
+        return None
+    
+    # 1. Prioritize "#PLATE" format (common in Turo descriptions)
+    # Handles: "#77FPQF", "# 77FPQF", "FL #77FPQF", etc.
+    match = re.search(r"#\s*([a-zA-Z0-9]{4,10})", vehicle_str)
+    if match:
+        return match.group(1).upper()
+    
+    # 2. Fallback: look for alphanumeric strings of 4-10 chars inside parentheses
+    # Handles: "Mercedes (77FPQF)", "Mercedes (FL 77FPQF)"
+    matches = re.findall(r"\(([^)]+)\)", vehicle_str)
+    for m in matches:
+        words = m.split()
+        if words:
+            last_word = words[-1]
+            plate_candidate = last_word.upper()
+            # Validate it looks like a plate (alphanumeric, not a common descriptive word)
+            if 4 <= len(plate_candidate) <= 10 and re.match(r"^[A-Z0-9]+$", plate_candidate):
+                non_plate_words = ["SMALL", "LARGE", "WHITE", "BLACK", "SILVER", "GREY", "GRAY", "AUTO", "NEW", "USED"]
+                if plate_candidate not in non_plate_words:
+                    # Turo plates usually have at least one digit or are 6+ characters
+                    if any(c.isdigit() for c in plate_candidate) or len(plate_candidate) >= 6:
+                        return plate_candidate
+                    
+    return None
+
 def import_turo_csv(file_obj):
     if hasattr(file_obj, 'read'):
         content = file_obj.read().decode('utf-8').splitlines()
@@ -53,9 +82,12 @@ def import_turo_csv(file_obj):
         for row in reader:
             clean_row = {k.strip().replace('"', ''): v for k, v in row.items() if k}
             
+            vin = clean_row.get('VIN', '').strip()
+            if not vin:
+                continue # VIN is mandatory (Requirement)
+
             start_dt = parse_datetime(clean_row.get('Trip start'))
             end_dt = parse_datetime(clean_row.get('Trip end'))
-            vin = clean_row.get('VIN', '').strip()
             
             # Find related vehicle
             vehicle_obj = Vehicle.objects.filter(vin=vin).first()
@@ -67,7 +99,7 @@ def import_turo_csv(file_obj):
                 period_obj = Period.objects.filter(period_key=period_key).first()
                 if not period_obj:
                     # Optional: Automatically create period if missing
-                    from datetime import date, timedelta
+                    from datetime import date
                     import calendar
                     last_day = calendar.monthrange(start_dt.year, start_dt.month)[1]
                     period_obj = Period.objects.create(
@@ -76,14 +108,18 @@ def import_turo_csv(file_obj):
                         end_date=date(start_dt.year, start_dt.month, last_day)
                     )
 
+            vehicle_str = clean_row.get('Vehicle', '').strip()
+            plate_extracted = extract_plate(vehicle_str)
+
             trip_data = {
                 'guest': clean_row.get('Guest', '').strip(),
-                'vehicle_str': clean_row.get('Vehicle', '').strip(), # Renamed
+                'vehicle_str': vehicle_str,
                 'vehicle_obj': vehicle_obj,
                 'period_obj': period_obj,
                 'vehicle_name': clean_row.get('Vehicle name', '').strip(),
                 'vehicle_id': clean_row.get('Vehicle id', '').strip(),
                 'vin': vin,
+                'plate_extracted': plate_extracted,
                 'start_date': start_dt,
                 'end_date': end_dt,
                 'pickup_location': clean_row.get('Pickup location', '').strip(),

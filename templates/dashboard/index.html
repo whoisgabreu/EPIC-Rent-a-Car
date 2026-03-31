@@ -22,46 +22,96 @@
         </p>
     </div>
 
-    {% if is_admin %}
-    <div class="filter-container">
-        <span style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--secondary);">Filter Investor:</span>
-        <form action="" method="get" id="investorFilterForm">
-            <select name="investor_id" class="form-control" onchange="this.form.submit()" style="min-width: 250px;">
-                <option value="">-- All Investors --</option>
-                {% for inv in all_investors %}
-                <option value="{{ inv.id }}" {% if selected_investor_id == inv.id|stringformat:"s" %}selected{% endif %}>
-                    {{ inv.name }}
-                </option>
-                {% endfor %}
-            </select>
-        </form>
+    <div class="filter-container" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <!-- Date Filter (For Everyone) -->
+        <div>
+            <span style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--secondary); display: block; margin-bottom: 0.25rem;">Period:</span>
+            <form action="" method="get" id="dateFilterForm" style="display: inline-block;">
+                {% if selected_investor_id %}
+                    <input type="hidden" name="investor_id" value="{{ selected_investor_id }}">
+                {% endif %}
+                <select name="date_filter" class="form-control" onchange="this.form.submit()" style="min-width: 150px;">
+                    <option value="all_time" {% if date_filter == 'all_time' %}selected{% endif %}>All time</option>
+                    <option value="current_month" {% if date_filter == 'current_month' %}selected{% endif %}>Last month</option>
+                </select>
+            </form>
+        </div>
+
+        {% if is_admin %}
+        <div>
+            <span style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--secondary); display: block; margin-bottom: 0.25rem;">Filter Investor:</span>
+            <form action="" method="get" id="investorFilterForm" style="display: inline-block;">
+                {% if date_filter %}
+                    <input type="hidden" name="date_filter" value="{{ date_filter }}">
+                {% endif %}
+                <select name="investor_id" class="form-control" onchange="this.form.submit()" style="min-width: 250px;">
+                    <option value="">-- All Investors --</option>
+                    {% for inv in all_investors %}
+                    <option value="{{ inv.id }}" {% if selected_investor_id == inv.id|stringformat:"s" %}selected{% endif %}>
+                        {{ inv.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
 </header>
+
+{% if is_admin and unmapped_vehicles %}
+<div class="alert mb-4" style="background-color: var(--warning); color: #fff; padding: 1rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+    <div>
+        <strong>Warning:</strong> Unidentified vehicles found in the CSV. ({{ unmapped_vehicles|length }} vehicle(s))
+    </div>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        {% for uf in unmapped_vehicles %}
+        <a href="{% url 'admin_vehicle_create' %}?vin={{ uf.vin|urlencode }}&name={{ uf.name|urlencode }}&plate={{ uf.plate|urlencode }}" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: #fff; text-decoration: none; border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+            Register: {{ uf.vin|slice:":6" }}... (Plate: {{ uf.plate|default:'-' }})
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 
 {% if not no_profile %}
 <!-- Main Metrics Grid -->
-<div class="stats-grid">
+<style>
+.stats-grid-extended {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+</style>
+<div class="stats-grid-extended">
     <div class="stat-card highlight-info">
-        <div class="stat-label">Gross Operating Revenue</div>
+        <div class="stat-label">Realized GOR (Completed)</div>
         <div class="stat-value">$ {{ metrics.gross_earnings|floatformat:2|intcomma }}</div>
         <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">
-            ADR: <strong>$ {{ metrics.adr|floatformat:2|intcomma }}</strong> / dia
+            ADR: <strong>$ {{ metrics.adr|floatformat:2|intcomma }}</strong> / day
+        </div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid var(--secondary);">
+        <div class="stat-label">Forecast Revenue</div>
+        <div class="stat-value">$ {{ forecast_revenue|floatformat:2|intcomma }}</div>
+        <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">
+            (Booked + In-progress)
         </div>
     </div>
     <div class="stat-card highlight-success">
         <div class="stat-label">{% if is_admin and not investor %}Total Investors Profit (60%){% else %}Your Profit (60%){% endif %}</div>
         <div class="stat-value">$ {{ metrics.investor_share|floatformat:2|intcomma }}</div>
         <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">
-            Volume: <strong>{{ metrics.total_trips }}</strong> trips in <strong>{{ metrics.total_days }}</strong> days
+            Realized over <strong>{{ metrics.total_trips }}</strong> trips
         </div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="border-left: 4px solid var(--primary-dark);">
         <div class="stat-label">EPIC Commission (40%)</div>
         <div class="stat-value">$ {{ metrics.epic_share|floatformat:2|intcomma }}</div>
     </div>
 </div>
 
+{% if is_admin %}
 <!-- Detailed Expenses Grid -->
 <div class="mb-4">
     <h3 class="mb-2" style="font-size: 1.25rem; font-weight: 600; color: var(--primary-dark);">Expense Breakdown (Deductions)</h3>
@@ -85,6 +135,7 @@
     </div>
 </div>
 {% endif %}
+{% endif %}
 
 <div class="mb-4">
     <div class="card" style="padding: 1.5rem;">
@@ -95,8 +146,8 @@
                     <tr>
                         <th>Vehicle</th>
                         <th>License Plate</th>
+                        <th style="text-align: center;">Avg. Trip Days</th>
                         <th style="text-align: center;">Trips</th>
-                        <th style="text-align: right;">Op. Result</th>
                         <th style="text-align: right;">{% if is_admin %}Investor Profit{% else %}Your Profit (60%){% endif %}</th>
                     </tr>
                 </thead>
@@ -105,8 +156,8 @@
                     <tr style="transition: background 0.2s;">
                         <td><strong>{{ stat.name }}</strong><br><small class="text-muted">{{ stat.vin }}</small></td>
                         <td><code>{{ stat.plate }}</code></td>
+                        <td style="text-align: center;">{{ stat.avg_trip_days }}</td>
                         <td style="text-align: center;">{{ stat.trips }}</td>
-                        <td style="text-align: right;">$ {{ stat.earnings|floatformat:2|intcomma }}</td>
                         <td style="text-align: right;"><strong style="color: var(--success);">$ {{ stat.investor_share|floatformat:2|intcomma }}</strong></td>
                     </tr>
                     {% empty %}
@@ -142,7 +193,7 @@
                     <td><code>{{ trip.reservation_id }}</code></td>
                     <td>{{ trip.vehicle_name }}</td>
                     <td>{{ trip.guest }}</td>
-                    <td>{{ trip.start_date|date:"d/m/Y H:i" }}</td>
+                    <td>{{ trip.start_date|date:"m/d/Y h:i A" }}</td>
                     <td>
                         <span class="badge badge-{{ trip.trip_status|lower|slugify }}">
                             {{ trip.trip_status }}

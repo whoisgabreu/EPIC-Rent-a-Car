@@ -13,6 +13,10 @@ urlpatterns = [
     path('', DashboardView.as_view(), name='dashboard'),
     path('login/', auth_views.LoginView.as_view(template_name='dashboard/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+    path('password_change/', auth_views.PasswordChangeView.as_view(
+        template_name='dashboard/password_change.html',
+        success_url='/'
+    ), name='password_change'),
     path('upload/', UploadCSVView.as_view(), name='upload_csv'),
 
     # ── Admin Panel ───────────────────────────
