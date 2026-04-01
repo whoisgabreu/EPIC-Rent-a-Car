@@ -10,6 +10,12 @@ from django.db.models import Sum, Count, Q
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from decimal import Decimal
 from django.utils import timezone
+
+# ── Profit Split Constants ─────────────────────────────────────────
+# Change these values to update the profit split across the entire system.
+INVESTOR_PROFIT_SHARE = Decimal('0.50')  # Investor's share of operational result
+EPIC_PROFIT_SHARE     = Decimal('0.50')  # EPIC's commission share
+# ──────────────────────────────────────────────────────────────────
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     """Mixin that restricts access to admin (is_staff) users only."""
     def test_func(self):
@@ -125,8 +131,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         
         # Result Calculation (PO Formula)
         resultado_operacional = base_earnings - total_deductions
-        investor_share = resultado_operacional * Decimal('0.60')
-        epic_share = resultado_operacional * Decimal('0.40')
+        investor_share = resultado_operacional * INVESTOR_PROFIT_SHARE
+        epic_share = resultado_operacional * EPIC_PROFIT_SHARE
 
         context['metrics'] = {
             'gross_earnings': gross_earnings,
@@ -192,7 +198,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 'trips': v_count,
                 'avg_trip_days': round(v_avg_days, 1),
                 'earnings': v_res,
-                'investor_share': v_res * Decimal('0.60')
+                'investor_share': v_res * INVESTOR_PROFIT_SHARE
             })
             
         context['vehicle_stats'] = sorted(vehicle_stats, key=lambda x: x['investor_share'], reverse=True)

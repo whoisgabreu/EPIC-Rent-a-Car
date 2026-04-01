@@ -99,14 +99,14 @@
         </div>
     </div>
     <div class="stat-card highlight-success">
-        <div class="stat-label">{% if is_admin and not investor %}Total Investors Profit (60%){% else %}Your Profit (60%){% endif %}</div>
+        <div class="stat-label">{% if is_admin and not investor %}Total Investors Profit (50%){% else %}Your Profit (50%){% endif %}</div>
         <div class="stat-value">$ {{ metrics.investor_share|floatformat:2|intcomma }}</div>
         <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">
             Realized over <strong>{{ metrics.total_trips }}</strong> trips
         </div>
     </div>
     <div class="stat-card" style="border-left: 4px solid var(--primary-dark);">
-        <div class="stat-label">EPIC Commission (40%)</div>
+        <div class="stat-label">EPIC Commission (50%)</div>
         <div class="stat-value">$ {{ metrics.epic_share|floatformat:2|intcomma }}</div>
     </div>
 </div>
@@ -148,7 +148,7 @@
                         <th>License Plate</th>
                         <th style="text-align: center;">Avg. Trip Days</th>
                         <th style="text-align: center;">Trips</th>
-                        <th style="text-align: right;">{% if is_admin %}Investor Profit{% else %}Your Profit (60%){% endif %}</th>
+                        <th style="text-align: right;">{% if is_admin %}Investor Profit{% else %}Your Profit (50%){% endif %}</th>
                     </tr>
                 </thead>
                 <tbody>
