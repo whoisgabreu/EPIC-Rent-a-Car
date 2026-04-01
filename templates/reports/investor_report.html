@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Portfolio Performance – {{ investor.name }}</title>
+  <style>
+    /* ── Page Setup ─────────────────────────────────────── */
+    @page {
+      size: A4 landscape;
+      margin: 0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 9pt;
+      color: #2C3E50;
+      background: #ffffff;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .header {
+      background: #1B2B52;
+      color: #ffffff;
+      padding: 18px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid #3B82F6;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-box {
+      background: #131F3E;
+      border: 1px solid #2D4075;
+      border-radius: 5px;
+      padding: 8px 14px;
+      text-align: center;
+    }
+    .logo-text {
+      font-size: 15pt;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: #ffffff;
+    }
+
+    .divider-v {
+      width: 1px;
+      height: 44px;
+      background: #2D4075;
+    }
+
+    .investor-meta {}
+    .investor-meta-label {
+      font-size: 6.5pt;
+      color: #8BA3CC;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+    .investor-meta-name {
+      font-size: 17pt;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .investor-meta-sub {
+      font-size: 7.5pt;
+      color: #8BA3CC;
+      margin-top: 2px;
+    }
+
+    .header-right { text-align: right; }
+    .period-label {
+      font-size: 6.5pt;
+      color: #8BA3CC;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .period-dates {
+      font-size: 12pt;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .earnings-badge {
+      margin-top: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 6px;
+      padding: 6px 14px;
+    }
+    .earnings-badge-label {
+      font-size: 6.5pt;
+      color: #8BA3CC;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .earnings-badge-value {
+      font-size: 14pt;
+      font-weight: 800;
+      color: #4ADE80;
+    }
+
+    /* ── Body ────────────────────────────────────────────── */
+    .body { padding: 16px 28px; }
+
+    /* ── Metric Cards ────────────────────────────────────── */
+    .cards-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .card {
+      flex: 1;
+      border: 1px solid #E2E8F0;
+      border-radius: 6px;
+      padding: 10px 12px;
+      background: #ffffff;
+    }
+    .card-highlight {
+      border-top: 3px solid #3B82F6;
+    }
+    .card-label {
+      font-size: 6pt;
+      color: #8892A4;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 700;
+    }
+    .card-value {
+      font-size: 16pt;
+      font-weight: 800;
+      color: #1B2B52;
+      line-height: 1.1;
+      margin-top: 3px;
+    }
+    .card-value-green { color: #16A34A; }
+    .card-value-blue  { color: #2563EB; }
+    .card-sub {
+      font-size: 7pt;
+      color: #8892A4;
+      margin-top: 2px;
+    }
+
+    /* ── Summary ─────────────────────────────────────────── */
+    .summary-box {
+      border-left: 3px solid #3B82F6;
+      background: #F8FAFC;
+      padding: 10px 14px;
+      border-radius: 0 5px 5px 0;
+      margin-bottom: 14px;
+      font-size: 8.5pt;
+      line-height: 1.65;
+      color: #374151;
+    }
+    .summary-box strong { color: #1B2B52; }
+
+    /* ── Charts ──────────────────────────────────────────── */
+    .charts-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .chart-box {
+      flex: 1;
+      border: 1px solid #E2E8F0;
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .chart-title {
+      font-size: 6.5pt;
+      font-weight: 700;
+      color: #3B82F6;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    /* ── Table ───────────────────────────────────────────── */
+    .table-title {
+      font-size: 6.5pt;
+      font-weight: 700;
+      color: #3B82F6;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+    table.vt {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 7.8pt;
+    }
+    table.vt thead tr {
+      background: #1B2B52;
+      color: #ffffff;
+    }
+    table.vt thead th {
+      padding: 7px 7px;
+      text-align: left;
+      font-size: 6pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    table.vt tbody tr:nth-child(even) { background: #F8FAFC; }
+    table.vt tbody td {
+      padding: 6px 7px;
+      border-bottom: 1px solid #EEF0F4;
+      vertical-align: middle;
+    }
+    table.vt tbody tr td:first-child { font-weight: 600; }
+
+    .tr { text-align: right; }
+    .tc { text-align: center; }
+
+    /* Cancellation badges */
+    .badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 7pt;
+      font-weight: 700;
+    }
+    .badge-orange { background: #FEF3C7; color: #B45309; }
+    .badge-green  { background: #D1FAE5; color: #065F46; }
+
+    /* Occupancy badges */
+    .occ {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 3px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .occ-green  { background: #22C55E; }
+    .occ-yellow { background: #F59E0B; }
+    .occ-red    { background: #EF4444; }
+
+    /* Total row */
+    table.vt tfoot tr td {
+      background: #1B2B52;
+      color: #ffffff;
+      font-weight: 700;
+      padding: 7px 7px;
+      font-size: 7.8pt;
+    }
+    .green-val { color: #4ADE80; }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .footer {
+      margin-top: 14px;
+      border-top: 1px solid #E2E8F0;
+      padding-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 6.5pt;
+      color: #9CA3AF;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HEADER ══════════════════════════════════════════════ -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-box">
+        <div class="logo-text">EPIC</div>
+      </div>
+      <div class="divider-v"></div>
+      <div class="investor-meta">
+        <div class="investor-meta-label">Investor Relations Report</div>
+        <div class="investor-meta-name">{{ investor.name }}</div>
+        <div class="investor-meta-sub">Portfolio Performance Summary &middot; {{ period_label }}</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="period-label">Reference Period</div>
+      <div class="period-dates">{{ period_start|date:"M d, Y" }} &ndash; {{ period_end|date:"M d, Y" }}</div>
+      <div class="earnings-badge">
+        <div class="earnings-badge-label">Your Earnings ({{ investor_share_pct }}% Share)</div>
+        <div class="earnings-badge-value">${{ summary.investor_share|floatformat:2 }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ BODY ════════════════════════════════════════════════ -->
+  <div class="body">
+
+    <!-- Metric Cards -->
+    <div class="cards-row">
+      <div class="card">
+        <div class="card-label">Vehicles</div>
+        <div class="card-value">{{ summary.total_vehicles }}</div>
+        <div class="card-sub">in portfolio</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Completed Trips</div>
+        <div class="card-value">{{ summary.total_trips }}</div>
+        <div class="card-sub">reservations</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Days Rented</div>
+        <div class="card-value">{{ summary.total_days }}</div>
+        <div class="card-sub">total days</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Avg. Occupancy</div>
+        <div class="card-value">{{ summary.avg_occupancy }}%</div>
+        <div class="card-sub">fleet average</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Net Earnings</div>
+        <div class="card-value">${{ summary.total_net|floatformat:0 }}</div>
+        <div class="card-sub">adjusted total</div>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-label">Daily Rate (Avg)</div>
+        <div class="card-value card-value-green">${{ summary.avg_daily|floatformat:2 }}</div>
+        <div class="card-sub">per rented day</div>
+      </div>
+    </div>
+
+    <!-- Summary Paragraph -->
+    <div class="summary-box">
+      Your portfolio of <strong>{{ summary.total_vehicles }} vehicles</strong> generated
+      <strong>${{ summary.total_net|floatformat:2 }} in net adjusted earnings</strong>
+      with an average fleet occupancy of <strong>{{ summary.avg_occupancy }}%</strong>.
+      {% if narrative.best_earnings_name %}
+        The <strong>{{ narrative.best_earnings_name }}</strong> leads the portfolio with
+        ${{ narrative.best_earnings_val|floatformat:2 }} in net earnings
+        {% if narrative.best_occupancy_name and narrative.best_occupancy_name != narrative.best_earnings_name %}
+          and {{ summary.total_trips }} completed trips, while the
+          <strong>{{ narrative.best_occupancy_name }}</strong> delivers the highest occupancy rate
+          at {{ narrative.best_occupancy_val }}%.
+        {% else %}.
+        {% endif %}
+      {% endif %}
+      Your {{ investor_share_pct }}% profit share amounts to
+      <strong>${{ summary.investor_share|floatformat:2 }}</strong> for the reference period.
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">Net Earnings by Vehicle</div>
+        {{ earnings_svg|safe }}
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Occupancy Rate by Vehicle (%)</div>
+        {{ occupancy_svg|safe }}
+      </div>
+    </div>
+
+    <!-- Vehicle Detail Table -->
+    <div class="table-title">Vehicle Detail</div>
+    <table class="vt">
+      <thead>
+        <tr>
+          <th>Vehicle</th>
+          <th class="tc">Trips</th>
+          <th class="tc">Cancellations</th>
+          <th class="tc">Days</th>
+          <th class="tc">Miles</th>
+          <th class="tr">Gross Price</th>
+          <th class="tr">Deductions</th>
+          <th class="tr">Net Earnings</th>
+          <th class="tr">Your {{ investor_share_pct }}%</th>
+          <th class="tr">Avg Daily</th>
+          <th class="tc">Occupancy</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in vehicle_rows %}
+        <tr>
+          <td>{{ row.name }}</td>
+          <td class="tc">{{ row.trips }}</td>
+          <td class="tc">
+            {% if row.cancellations > 0 %}
+              <span class="badge badge-orange">{{ row.cancellations }}</span>
+            {% else %}
+              <span class="badge badge-green">{{ row.cancellations }}</span>
+            {% endif %}
+          </td>
+          <td class="tc">{{ row.days }}</td>
+          <td class="tc">{{ row.miles|default:0 }}</td>
+          <td class="tr">${{ row.gross_price|floatformat:2 }}</td>
+          <td class="tr">${{ row.deductions|floatformat:2 }}</td>
+          <td class="tr">${{ row.net_earnings|floatformat:2 }}</td>
+          <td class="tr"><strong>${{ row.investor_share|floatformat:2 }}</strong></td>
+          <td class="tr">${{ row.avg_daily|floatformat:2 }}</td>
+          <td class="tc">
+            {% if row.occupancy >= 80 %}
+              <span class="occ occ-green">{{ row.occupancy }}%</span>
+            {% elif row.occupancy >= 60 %}
+              <span class="occ occ-yellow">{{ row.occupancy }}%</span>
+            {% else %}
+              <span class="occ occ-red">{{ row.occupancy }}%</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="11" style="text-align:center; color:#8892A4; padding:16px;">
+            No completed trips found for this period.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Total Portfolio</td>
+          <td class="tc">{{ summary.total_trips }}</td>
+          <td class="tc">{{ summary.total_cancellations }}</td>
+          <td class="tc">{{ summary.total_days }}</td>
+          <td class="tc">{{ summary.total_miles|default:0 }}</td>
+          <td class="tr">${{ summary.total_gross|floatformat:2 }}</td>
+          <td class="tr">${{ summary.total_deductions|floatformat:2 }}</td>
+          <td class="tr">${{ summary.total_net|floatformat:2 }}</td>
+          <td class="tr green-val">${{ summary.investor_share|floatformat:2 }}</td>
+          <td class="tr">${{ summary.avg_daily|floatformat:2 }}</td>
+          <td class="tc">{{ summary.avg_occupancy }}%</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <!-- Footer -->
+    <div class="footer">
+      <span>EPIC Rent a Car &mdash; Investor Portfolio Report</span>
+      <span>Generated: {{ generated_at }}</span>
+    </div>
+
+  </div><!-- /body -->
+</body>
+</html>

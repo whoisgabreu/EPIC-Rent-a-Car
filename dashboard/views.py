@@ -3,13 +3,18 @@ from django.views.generic import TemplateView, ListView, View, CreateView, Updat
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
+from django.http import HttpResponse
 from .models import TuroTrip, Investor, Vehicle
 from .forms import UserCreateForm, UserUpdateForm, InvestorForm, VehicleForm
 from .utils.importer import import_turo_csv
+from .utils.report_service import build_report_context
 from django.db.models import Sum, Count, Q
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from decimal import Decimal
 from django.utils import timezone
+from django.template.loader import render_to_string
+from datetime import date as _date
+import weasyprint
 
 # ── Profit Split Constants ─────────────────────────────────────────
 # Change these values to update the profit split across the entire system.
@@ -203,6 +208,73 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             
         context['vehicle_stats'] = sorted(vehicle_stats, key=lambda x: x['investor_share'], reverse=True)
         return context
+
+# ══════════════════════════════════════════════════════════════════
+#  INVESTOR PORTFOLIO REPORT  (PDF download)
+# ══════════════════════════════════════════════════════════════════
+
+class InvestorReportView(LoginRequiredMixin, View):
+    """
+    GET /report/?investor_id=<id>&date_filter=<all_time|current_month>
+              &date_from=YYYY-MM-DD&date_to=YYYY-MM-DD
+
+    - Regular investors can only generate their own report.
+    - Admins can pass investor_id to generate for any investor.
+    """
+
+    def get(self, request):
+        user = request.user
+        is_admin = user.is_staff or user.is_superuser
+
+        # Resolve investor
+        investor_id = request.GET.get('investor_id')
+        if is_admin and investor_id:
+            investor = get_object_or_404(Investor, pk=investor_id)
+        else:
+            try:
+                investor = user.investor_profile
+            except Exception:
+                messages.error(request, 'No investor profile linked to your account.')
+                return redirect('dashboard')
+
+        # Date params
+        date_filter = request.GET.get('date_filter', 'all_time')
+        date_from = None
+        date_to = None
+        raw_from = request.GET.get('date_from')
+        raw_to   = request.GET.get('date_to')
+        if raw_from and raw_to:
+            try:
+                date_from = _date.fromisoformat(raw_from)
+                date_to   = _date.fromisoformat(raw_to)
+            except ValueError:
+                pass
+
+        # Build context
+        ctx = build_report_context(
+            investor=investor,
+            date_filter=date_filter,
+            date_from=date_from,
+            date_to=date_to,
+        )
+        ctx['generated_at'] = timezone.now().strftime('%b %d, %Y  %H:%M UTC')
+
+        # Render HTML → PDF
+        html_string = render_to_string('reports/investor_report.html', ctx, request=request)
+        pdf_bytes = weasyprint.HTML(
+            string=html_string,
+            base_url=request.build_absolute_uri('/')
+        ).write_pdf()
+
+        # Dynamic filename
+        safe_name = investor.name.replace(' ', '_')
+        period_tag = ctx['period_label'].replace(' ', '_').replace('–', '-')
+        filename = f'report_{safe_name}_{period_tag}.pdf'
+
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
 
 class UploadCSVView(AdminRequiredMixin, View):
     def get(self, request):

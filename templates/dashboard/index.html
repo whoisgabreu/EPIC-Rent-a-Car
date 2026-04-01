@@ -4,45 +4,51 @@
 {% block title %}Dashboard | EPIC Rental{% endblock %}
 
 {% block content %}
-<header class="mb-4" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1.5rem;">
+<header class="mb-4"
+    style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1.5rem;">
     <div>
-        <h1 style="font-size: 2.5rem; background: linear-gradient(135deg, var(--primary-dark), var(--primary-vibrant)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        <h1
+            style="font-size: 2.5rem; background: linear-gradient(135deg, var(--primary-dark), var(--primary-vibrant)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
             {% if is_admin %}EPIC Management Dashboard{% else %}Investor Portal{% endif %}
         </h1>
         <p class="text-muted" style="font-size: 1.1rem; margin-top: 0.5rem;">
             {% if is_admin %}
-                {% if investor %}
-                    Detailed view: <strong>{{ investor.name }}</strong>
-                {% else %}
-                    Consolidated view of global operations.
-                {% endif %}
+            {% if investor %}
+            Detailed view: <strong>{{ investor.name }}</strong>
             {% else %}
-                Welcome, <strong>{{ investor.name }}</strong>. Track your fleet's performance.
+            Consolidated view of global operations.
+            {% endif %}
+            {% else %}
+            Welcome, <strong>{{ investor.name }}</strong>. Track your fleet's performance.
             {% endif %}
         </p>
     </div>
 
-    <div class="filter-container" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <div class="filter-container" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
         <!-- Date Filter (For Everyone) -->
         <div>
-            <span style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--secondary); display: block; margin-bottom: 0.25rem;">Period:</span>
+            <span
+                style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--secondary); display: block; margin-bottom: 0.25rem;">Period:</span>
             <form action="" method="get" id="dateFilterForm" style="display: inline-block;">
                 {% if selected_investor_id %}
-                    <input type="hidden" name="investor_id" value="{{ selected_investor_id }}">
+                <input type="hidden" name="investor_id" value="{{ selected_investor_id }}">
                 {% endif %}
                 <select name="date_filter" class="form-control" onchange="this.form.submit()" style="min-width: 150px;">
-                    <option value="all_time" {% if date_filter == 'all_time' %}selected{% endif %}>All time</option>
-                    <option value="current_month" {% if date_filter == 'current_month' %}selected{% endif %}>Last month</option>
+                    <option value="all_time" {% if date_filter == 'all_time' %} selected {% endif %}>All time</option>
+                    <option value="current_month" {% if date_filter == 'current_month' %}selected{% endif %}>Last month
+                    </option>
                 </select>
             </form>
         </div>
 
         {% if is_admin %}
         <div>
-            <span style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--secondary); display: block; margin-bottom: 0.25rem;">Filter Investor:</span>
+            <span
+                style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--secondary); display: block; margin-bottom: 0.25rem;">Filter
+                Investor:</span>
             <form action="" method="get" id="investorFilterForm" style="display: inline-block;">
                 {% if date_filter %}
-                    <input type="hidden" name="date_filter" value="{{ date_filter }}">
+                <input type="hidden" name="date_filter" value="{{ date_filter }}">
                 {% endif %}
                 <select name="investor_id" class="form-control" onchange="this.form.submit()" style="min-width: 250px;">
                     <option value="">-- All Investors --</option>
@@ -55,17 +61,37 @@
             </form>
         </div>
         {% endif %}
+
+        {% if investor %}
+        <div style="margin-bottom: 2px;">
+            <a href="{% url 'investor_report' %}?date_filter={{ date_filter }}&investor_id={{ selected_investor_id|default:'' }}"
+                class="btn" title="Download PDF Report"
+                style="background: var(--primary-vibrant); color: #fff; width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);"
+                onmouseover="this.style.background='var(--primary-dark)'; this.style.transform='scale(1.05)'"
+                onmouseout="this.style.background='var(--primary-vibrant)'; this.style.transform='scale(1)'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+            </a>
+        </div>
+        {% endif %}
     </div>
 </header>
 
 {% if is_admin and unmapped_vehicles %}
-<div class="alert mb-4" style="background-color: var(--warning); color: #fff; padding: 1rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+<div class="alert mb-4"
+    style="background-color: var(--warning); color: #fff; padding: 1rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
     <div>
         <strong>Warning:</strong> Unidentified vehicles found in the CSV. ({{ unmapped_vehicles|length }} vehicle(s))
     </div>
     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
         {% for uf in unmapped_vehicles %}
-        <a href="{% url 'admin_vehicle_create' %}?vin={{ uf.vin|urlencode }}&name={{ uf.name|urlencode }}&plate={{ uf.plate|urlencode }}" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: #fff; text-decoration: none; border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+        <a href="{% url 'admin_vehicle_create' %}?vin={{ uf.vin|urlencode }}&name={{ uf.name|urlencode }}&plate={{ uf.plate|urlencode }}"
+            class="btn btn-sm"
+            style="background: rgba(255,255,255,0.2); color: #fff; text-decoration: none; border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
             Register: {{ uf.vin|slice:":6" }}... (Plate: {{ uf.plate|default:'-' }})
         </a>
         {% endfor %}
@@ -76,12 +102,12 @@
 {% if not no_profile %}
 <!-- Main Metrics Grid -->
 <style>
-.stats-grid-extended {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
+    .stats-grid-extended {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
 </style>
 <div class="stats-grid-extended">
     <div class="stat-card highlight-info">
@@ -99,7 +125,8 @@
         </div>
     </div>
     <div class="stat-card highlight-success">
-        <div class="stat-label">{% if is_admin and not investor %}Total Investors Profit (50%){% else %}Your Profit (50%){% endif %}</div>
+        <div class="stat-label">{% if is_admin and not investor %}Total Investors Profit (50%){% else %}Your Profit
+            (50%){% endif %}</div>
         <div class="stat-value">$ {{ metrics.investor_share|floatformat:2|intcomma }}</div>
         <div style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--text-muted);">
             Realized over <strong>{{ metrics.total_trips }}</strong> trips
@@ -114,19 +141,23 @@
 {% if is_admin %}
 <!-- Detailed Expenses Grid -->
 <div class="mb-4">
-    <h3 class="mb-2" style="font-size: 1.25rem; font-weight: 600; color: var(--primary-dark);">Expense Breakdown (Deductions)</h3>
+    <h3 class="mb-2" style="font-size: 1.25rem; font-weight: 600; color: var(--primary-dark);">Expense Breakdown
+        (Deductions)</h3>
     <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
         <div class="stat-card" style="padding: 1.25rem; border-left: 4px solid var(--warning);">
             <div class="stat-label" style="font-size: 0.65rem;">Tolls</div>
-            <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.tolls|floatformat:2|intcomma }}</div>
+            <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.tolls|floatformat:2|intcomma }}
+            </div>
         </div>
         <div class="stat-card" style="padding: 1.25rem; border-left: 4px solid var(--warning);">
             <div class="stat-label" style="font-size: 0.65rem;">Parking</div>
-            <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.parking|floatformat:2|intcomma }}</div>
+            <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.parking|floatformat:2|intcomma }}
+            </div>
         </div>
         <div class="stat-card" style="padding: 1.25rem; border-left: 4px solid var(--warning);">
             <div class="stat-label" style="font-size: 0.65rem;">Cleaning</div>
-            <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.cleaning|floatformat:2|intcomma }}</div>
+            <div class="stat-value" style="font-size: 1.5rem;">$ {{ metrics.expenses.cleaning|floatformat:2|intcomma }}
+            </div>
         </div>
         <div class="stat-card" style="padding: 1.25rem; border-left: 4px solid var(--warning);">
             <div class="stat-label" style="font-size: 0.65rem;">Gas</div>
@@ -199,7 +230,8 @@
                             {{ trip.trip_status }}
                         </span>
                     </td>
-                    <td style="text-align: right;"><strong>$ {{ trip.total_earnings|floatformat:2|intcomma }}</strong></td>
+                    <td style="text-align: right;"><strong>$ {{ trip.total_earnings|floatformat:2|intcomma }}</strong>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
