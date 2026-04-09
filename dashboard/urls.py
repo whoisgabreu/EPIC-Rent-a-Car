@@ -6,6 +6,7 @@ from .views import (
     UserListView, UserCreateView, UserUpdateView, UserDeleteView,
     InvestorListView, InvestorCreateView, InvestorUpdateView, InvestorDeleteView,
     VehicleListView, VehicleCreateView, VehicleUpdateView, VehicleDeleteView,
+    InvestorReportView,
 )
 
 urlpatterns = [
@@ -18,6 +19,7 @@ urlpatterns = [
         success_url='/'
     ), name='password_change'),
     path('upload/', UploadCSVView.as_view(), name='upload_csv'),
+    path('report/', InvestorReportView.as_view(), name='investor_report'),
 
     # ── Admin Panel ───────────────────────────
     path('admin-panel/', AdminPanelView.as_view(), name='admin_panel'),
