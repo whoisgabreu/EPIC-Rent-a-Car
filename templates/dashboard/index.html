@@ -34,8 +34,8 @@
                 <input type="hidden" name="investor_id" value="{{ selected_investor_id }}">
                 {% endif %}
                 <select name="date_filter" class="form-control" onchange="this.form.submit()" style="min-width: 150px;">
-                    <option value="all_time" {% if date_filter == 'all_time' %} selected {% endif %}>All time</option>
-                    <option value="current_month" {% if date_filter == 'current_month' %}selected{% endif %}>Last month
+                    <option value="all_time" {% if date_filter=='all_time' %} selected {% endif %}>All time</option>
+                    <option value="current_month" {% if date_filter=='current_month' %}selected{% endif %}>Last month
                     </option>
                 </select>
             </form>
@@ -53,7 +53,8 @@
                 <select name="investor_id" class="form-control" onchange="this.form.submit()" style="min-width: 250px;">
                     <option value="">-- All Investors --</option>
                     {% for inv in all_investors %}
-                    <option value="{{ inv.id }}" {% if selected_investor_id == inv.id|stringformat:"s" %}selected{% endif %}>
+                    <option value="{{ inv.id }}" {% if selected_investor_id==inv.id|stringformat:"s" %}selected{% endif
+                        %}>
                         {{ inv.name }}
                     </option>
                     {% endfor %}
@@ -179,7 +180,8 @@
                         <th>License Plate</th>
                         <th style="text-align: center;">Avg. Trip Days</th>
                         <th style="text-align: center;">Trips</th>
-                        <th style="text-align: right;">{% if is_admin %}Investor Profit{% else %}Your Profit (50%){% endif %}</th>
+                        <th style="text-align: right;">{% if is_admin %}Investor Profit{% else %}Your Profit (50%){%
+                            endif %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -189,7 +191,8 @@
                         <td><code>{{ stat.plate }}</code></td>
                         <td style="text-align: center;">{{ stat.avg_trip_days }}</td>
                         <td style="text-align: center;">{{ stat.trips }}</td>
-                        <td style="text-align: right;"><strong style="color: var(--success);">$ {{ stat.investor_share|floatformat:2|intcomma }}</strong></td>
+                        <td style="text-align: right;"><strong style="color: var(--success);">$ {{
+                                stat.investor_share|floatformat:2|intcomma }}</strong></td>
                     </tr>
                     {% empty %}
                     <tr>
