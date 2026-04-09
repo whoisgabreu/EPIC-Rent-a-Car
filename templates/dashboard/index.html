@@ -25,18 +25,19 @@
     </div>
 
     <div class="filter-container" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
-        <!-- Date Filter (For Everyone) -->
+        <!-- Period Filter (YYYY-MM from trip end_date) -->
         <div>
             <span
                 style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--secondary); display: block; margin-bottom: 0.25rem;">Period:</span>
-            <form action="" method="get" id="dateFilterForm" style="display: inline-block;">
+            <form action="" method="get" id="periodFilterForm" style="display: inline-block;">
                 {% if selected_investor_id %}
                 <input type="hidden" name="investor_id" value="{{ selected_investor_id }}">
                 {% endif %}
-                <select name="date_filter" class="form-control" onchange="this.form.submit()" style="min-width: 150px;">
-                    <option value="all_time" {% if date_filter=='all_time' %} selected {% endif %}>All time</option>
-                    <option value="current_month" {% if date_filter=='current_month' %}selected{% endif %}>Last month
-                    </option>
+                <select name="period" class="form-control" onchange="this.form.submit()" style="min-width: 180px;">
+                    <option value="all" {% if selected_period == 'all' %}selected{% endif %}>All time</option>
+                    {% for p in available_periods %}
+                    <option value="{{ p }}" {% if selected_period == p %}selected{% endif %}>{{ p }}</option>
+                    {% endfor %}
                 </select>
             </form>
         </div>
@@ -47,14 +48,13 @@
                 style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--secondary); display: block; margin-bottom: 0.25rem;">Filter
                 Investor:</span>
             <form action="" method="get" id="investorFilterForm" style="display: inline-block;">
-                {% if date_filter %}
-                <input type="hidden" name="date_filter" value="{{ date_filter }}">
+                {% if selected_period %}
+                <input type="hidden" name="period" value="{{ selected_period }}">
                 {% endif %}
                 <select name="investor_id" class="form-control" onchange="this.form.submit()" style="min-width: 250px;">
                     <option value="">-- All Investors --</option>
                     {% for inv in all_investors %}
-                    <option value="{{ inv.id }}" {% if selected_investor_id==inv.id|stringformat:"s" %}selected{% endif
-                        %}>
+                    <option value="{{ inv.id }}" {% if selected_investor_id == inv.id|stringformat:"s" %}selected{% endif %}>
                         {{ inv.name }}
                     </option>
                     {% endfor %}
@@ -65,7 +65,7 @@
 
         {% if investor %}
         <div style="margin-bottom: 2px;">
-            <a href="{% url 'investor_report' %}?date_filter={{ date_filter }}&investor_id={{ selected_investor_id|default:'' }}"
+            <a href="{% url 'investor_report' %}?period={{ selected_period }}&investor_id={{ selected_investor_id|default:'' }}"
                 class="btn" title="Download PDF Report"
                 style="background: var(--primary-vibrant); color: #fff; width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);"
                 onmouseover="this.style.background='var(--primary-dark)'; this.style.transform='scale(1.05)'"
@@ -180,8 +180,7 @@
                         <th>License Plate</th>
                         <th style="text-align: center;">Avg. Trip Days</th>
                         <th style="text-align: center;">Trips</th>
-                        <th style="text-align: right;">{% if is_admin %}Investor Profit{% else %}Your Profit (50%){%
-                            endif %}</th>
+                        <th style="text-align: right;">{% if is_admin %}Investor Profit{% else %}Your Profit (50%){% endif %}</th>
                     </tr>
                 </thead>
                 <tbody>

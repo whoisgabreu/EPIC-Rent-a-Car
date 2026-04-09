@@ -36,10 +36,18 @@ def _deduction_sum(agg):
     return sum(_d(agg.get(f)) for f in DEDUCTION_FIELDS)
 
 
-def _get_period(date_filter, date_from, date_to, base_qs):
+def _get_period(date_filter, date_from, date_to, period, base_qs):
     """Return (period_start, period_end) as date objects."""
     if date_from and date_to:
         return date_from, date_to
+
+    if period and period != 'all':
+        try:
+            year, month = map(int, period.split('-'))
+            last_day = calendar.monthrange(year, month)[1]
+            return date(year, month, 1), date(year, month, last_day)
+        except (ValueError, AttributeError):
+            pass
 
     if date_filter == 'current_month':
         now = timezone.now()
@@ -47,7 +55,7 @@ def _get_period(date_filter, date_from, date_to, base_qs):
         return date(now.year, now.month, 1), date(now.year, now.month, last_day)
 
     # all_time → use min/max of actual trip data
-    agg = base_qs.aggregate(mn=Min('start_date'), mx=Max('end_date'))
+    agg = base_qs.aggregate(mn=Min('end_date'), mx=Max('end_date'))
     if agg['mn'] and agg['mx']:
         return agg['mn'].date(), agg['mx'].date()
     today = date.today()
@@ -155,7 +163,7 @@ def _occupancy_svg(vehicle_rows):
 
 # ── Main Builder ──────────────────────────────────────────────────
 
-def build_report_context(investor, date_filter='all_time', date_from=None, date_to=None):
+def build_report_context(investor, date_filter='all_time', date_from=None, date_to=None, period=None):
     """
     Return a dict with all data needed by templates/reports/investor_report.html.
 
@@ -164,6 +172,7 @@ def build_report_context(investor, date_filter='all_time', date_from=None, date_
         date_filter – 'all_time' | 'current_month'
         date_from   – optional date object (custom range start)
         date_to     – optional date object (custom range end)
+        period      – optional 'YYYY-MM' string (month filter by end_date)
     """
 
     vehicles = Vehicle.objects.filter(investor=investor)
@@ -174,23 +183,33 @@ def build_report_context(investor, date_filter='all_time', date_from=None, date_
 
     if date_from and date_to:
         base_qs = base_qs.filter(
-            start_date__date__gte=date_from,
-            start_date__date__lte=date_to,
+            end_date__date__gte=date_from,
+            end_date__date__lte=date_to,
         )
+    elif period and period != 'all':
+        try:
+            p_year, p_month = map(int, period.split('-'))
+            base_qs = base_qs.filter(
+                end_date__year=p_year,
+                end_date__month=p_month,
+            )
+        except (ValueError, AttributeError):
+            pass
     elif date_filter == 'current_month':
         now = timezone.now()
         base_qs = base_qs.filter(
-            start_date__year=now.year,
-            start_date__month=now.month,
+            end_date__year=now.year,
+            end_date__month=now.month,
         )
 
-    period_start, period_end = _get_period(date_filter, date_from, date_to, base_qs)
+    period_start, period_end = _get_period(date_filter, date_from, date_to, period, base_qs)
     period_days = max((period_end - period_start).days + 1, 1)
     period_label = _period_label(period_start, period_end)
 
-    # Split by status
-    completed = base_qs.filter(trip_status='Completed')
-    cancelled_total = base_qs.filter(trip_status='Cancelled').count()
+    # Split by status — include active statuses
+    ACTIVE_STATUSES = ['Completed', 'Booked', 'In-progress']
+    completed = base_qs.filter(trip_status__in=ACTIVE_STATUSES)
+    cancelled_total = base_qs.exclude(trip_status__in=ACTIVE_STATUSES).count()
 
     # Portfolio-level aggregate
     agg_kwargs = {

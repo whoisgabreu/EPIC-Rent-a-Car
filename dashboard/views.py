@@ -9,6 +9,7 @@ from .forms import UserCreateForm, UserUpdateForm, InvestorForm, VehicleForm
 from .utils.importer import import_turo_csv
 from .utils.report_service import build_report_context
 from django.db.models import Sum, Count, Q
+from django.db.models.functions import TruncMonth
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from decimal import Decimal
 from django.utils import timezone
@@ -69,17 +70,39 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['investor'] = investor
         context['selected_investor_id'] = selected_investor_id
         
-        # Date Filter
-        date_filter = self.request.GET.get('date_filter', 'all_time')
-        if date_filter == 'current_month':
-            now = timezone.now()
-            trips = trips.filter(start_date__year=now.year, start_date__month=now.month)
-            
-        context['date_filter'] = date_filter
+        # ── Period Filter (YYYY-MM from end_date) ─────────────────────
+        # Build list of available months from trip end_date
+        available_months_qs = (
+            TuroTrip.objects
+            .filter(end_date__isnull=False)
+            .annotate(month=TruncMonth('end_date'))
+            .values_list('month', flat=True)
+            .distinct()
+            .order_by('-month')
+        )
+        available_periods = []
+        for m in available_months_qs:
+            if m:
+                available_periods.append(m.strftime('%Y-%m'))
+        context['available_periods'] = available_periods
 
-        # Split Realized and Forecast
-        realized_trips = trips.filter(trip_status='Completed')
-        forecast_trips = trips.filter(trip_status__in=['Booked', 'In-progress'])
+        selected_period = self.request.GET.get('period', 'all')
+        context['selected_period'] = selected_period
+
+        if selected_period != 'all':
+            try:
+                p_year, p_month = map(int, selected_period.split('-'))
+                trips = trips.filter(end_date__year=p_year, end_date__month=p_month)
+            except (ValueError, AttributeError):
+                pass  # fallback to unfiltered
+
+        # Active trips: only statuses that generate revenue
+        ACTIVE_STATUSES = ['Completed', 'Booked', 'In-progress']
+        active_trips = trips.filter(trip_status__in=ACTIVE_STATUSES)
+
+        # Split Realized and Forecast (for informational breakdown)
+        realized_trips = active_trips.filter(trip_status='Completed')
+        forecast_trips = active_trips.filter(trip_status__in=['Booked', 'In-progress'])
 
         # Forecast Metrics
         forecast_metrics = forecast_trips.aggregate(
@@ -239,6 +262,7 @@ class InvestorReportView(LoginRequiredMixin, View):
 
         # Date params
         date_filter = request.GET.get('date_filter', 'all_time')
+        period = request.GET.get('period')
         date_from = None
         date_to = None
         raw_from = request.GET.get('date_from')
@@ -256,6 +280,7 @@ class InvestorReportView(LoginRequiredMixin, View):
             date_filter=date_filter,
             date_from=date_from,
             date_to=date_to,
+            period=period,
         )
         ctx['generated_at'] = timezone.now().strftime('%b %d, %Y  %H:%M UTC')
 
