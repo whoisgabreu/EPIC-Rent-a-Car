@@ -190,8 +190,7 @@
                         <td><code>{{ stat.plate }}</code></td>
                         <td style="text-align: center;">{{ stat.avg_trip_days }}</td>
                         <td style="text-align: center;">{{ stat.trips }}</td>
-                        <td style="text-align: right;"><strong style="color: var(--success);">$ {{
-                                stat.investor_share|floatformat:2|intcomma }}</strong></td>
+                        <td style="text-align: right;"><strong style="color: var(--success);">$ {{ stat.investor_share|floatformat:2|intcomma }}</strong></td>
                     </tr>
                     {% empty %}
                     <tr>
